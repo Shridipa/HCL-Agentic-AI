@@ -1,0 +1,911 @@
+{
+  "summary": {
+    "total_cases": 100,
+    "retrieval_accuracy": 0.39,
+    "average_precision": 0.4399535914880666,
+    "average_recall": 0.11606223109040839,
+    "average_f1": 0.18367101557487178
+  },
+  "details": [
+    {
+      "id": 1,
+      "query": "What is the name of the company that provides retirement benefit pension plans in accordance with the local laws?",
+      "output": "Question 1: What is the name of the company that provides retirement benefit pension plans in accordance with the local laws? Ce/r_t.ligaain subsidiaries [Annual Report 2024\u201325, Page 352]",
+      "retrieval_hit": true,
+      "precision": 0.5652173913043478,
+      "recall": 0.10569105691056911,
+      "f1": 0.1780821917808219
+    },
+    {
+      "id": 2,
+      "query": "What company was acquired by HCL Technologies UK Limited?",
+      "output": "I am escalating this request to a human agent. Reason: Urgent/Negative request with low confidence (0.32).",
+      "retrieval_hit": false,
+      "precision": 0.09090909090909091,
+      "recall": 0.009708737864077669,
+      "f1": 0.017543859649122806
+    },
+    {
+      "id": 3,
+      "query": "What is the name of the company that is a part of the CGU?",
+      "output": "Question 1: What is the name of the company that is a part of the CGU? Group\u2019s cash generating units [Annual Report 2024\u201325, Page 350]",
+      "retrieval_hit": false,
+      "precision": 0.23529411764705882,
+      "recall": 0.09302325581395349,
+      "f1": 0.13333333333333333
+    },
+    {
+      "id": 4,
+      "query": "What is the goal of ESG?",
+      "output": "Question 1: What is the goal of ESG? a sustainable and ethical future [Annual Report 2024\u201325, Page 90]",
+      "retrieval_hit": true,
+      "precision": 0.6153846153846154,
+      "recall": 0.050955414012738856,
+      "f1": 0.09411764705882354
+    },
+    {
+      "id": 5,
+      "query": "What is the average cost of the energy used in the energy industry?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.01) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0
+    },
+    {
+      "id": 6,
+      "query": "What is the name of the board of directors that is responsible for the audit committee?",
+      "output": "Question 1: What is the name of the board of directors that is responsible for the audit committee? Company\u2019s financial repo/r_t.ligaing process [Annual Report 2024\u201325, Page 253]",
+      "retrieval_hit": false,
+      "precision": 0.22727272727272727,
+      "recall": 0.08064516129032258,
+      "f1": 0.11904761904761903
+    },
+    {
+      "id": 7,
+      "query": "What is the primary risk details of the Mitigation Competition?",
+      "output": "Question 1: What is the primary risk details of the Mitigation Competition? According to the report on page 95: Primary Risk Details Mitigation Competition HCLTech operates in a fiercely competitive market with various companies vying for the same clients. Additionally, we face competition from management consulting, advisory firms and GCCs (Global Capability Centers) that are emerging as strong players. This... [Annual Report 2024\u201325, Page 95]",
+      "retrieval_hit": true,
+      "precision": 0.8372093023255814,
+      "recall": 0.21052631578947367,
+      "f1": 0.33644859813084116
+    },
+    {
+      "id": 8,
+      "query": "What is the name of the company that produces the annual dividend of /uni20B960 per share - - - 16254) - - - - - - - - -",
+      "output": "Question 1: What is the name of the company that produces the annual dividend of /uni20B960 per share - - - 16254) - - - - - - - - - According to the report on page 105: Consolidated Results This part of the Management Discussion and Analysis refers to the consolidated financial statements of HCL (the \u201cCompany\u201d or the \u201cParent Company\u201d) and its subsidiaries referred to as the \u201cGroup\u201d. The discussion should be read in conjunction with the financial statements and rela... [Annual Report 2024\u201325, Page 105]",
+      "retrieval_hit": false,
+      "precision": 0.325,
+      "recall": 0.06842105263157895,
+      "f1": 0.11304347826086956
+    },
+    {
+      "id": 9,
+      "query": "What is the name of the company that is a member of the Central Government?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.05) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.029411764705882353,
+      "f1": 0.047619047619047616
+    },
+    {
+      "id": 10,
+      "query": "What is the name of the company that is a member of the ICAI?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.03) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.016666666666666666,
+      "f1": 0.029411764705882353
+    },
+    {
+      "id": 11,
+      "query": "What is the name of the company that is positioned as a leader in the IDC MarketScape: Worldwide Discrete Manufacturing PLM Strategic Consulting Services 2024 Vendor Assessment (doc# US52721622,",
+      "output": "Question 1: What is the name of the company that is positioned as a leader in the IDC MarketScape: Worldwide Discrete Manufacturing PLM Strategic Consulting Services 2024 Vendor Assessment (doc# US52721622, According to the report on page 23: HCLTech positioned as a Leader in: ERS IDC MarketScape: Worldwide Discrete Manufacturing PLM Strategic Consulting Services 2024 Vendor Assessment (doc # US52721622, Nov 2024) IDC MarketScape: Worldwide Industrial IoT Consulting and Integration Services 2025 Vendor Assessment (doc# US51812824, Mar 20... [Annual Report 2024\u201325, Page 23]",
+      "retrieval_hit": true,
+      "precision": 0.75,
+      "recall": 0.35064935064935066,
+      "f1": 0.4778761061946903
+    },
+    {
+      "id": 12,
+      "query": "What is the purpose of the project?",
+      "output": "Question 1: What is the purpose of the project? to provide awareness sessions, mass campaigns, health-camps, soap banks and other crucial activities to create a safe, healthy, and suppo/r_t.ligaive environment for school children [Annual Report 2024\u201325, Page 143]",
+      "retrieval_hit": false,
+      "precision": 0.24242424242424243,
+      "recall": 0.05517241379310345,
+      "f1": 0.0898876404494382
+    },
+    {
+      "id": 13,
+      "query": "What is the name of the director of the CSR Commi/t_t.ligaee?",
+      "output": "Question 1: What is the name of the director of the CSR Commi/t_t.ligaee? According to the report on page 134: Hygiene, Environment, Disaster Risk Reduction & Response and Gender & Inclusion. 2. The composition of the CSR Commi/t_t.ligaee S. No. Name of Director Designation/Nature of Directorship Number of meetings of CSR Commi/t_t.ligaee held during the year # Number of meetings of CSR Commi/t_t.ligaee a/t_... [Annual Report 2024\u201325, Page 134]",
+      "retrieval_hit": true,
+      "precision": 0.7878787878787878,
+      "recall": 0.23423423423423423,
+      "f1": 0.36111111111111105
+    },
+    {
+      "id": 14,
+      "query": "What is the name of the company that uses video conferencing facility?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.00) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.020833333333333332,
+      "f1": 0.03571428571428571
+    },
+    {
+      "id": 15,
+      "query": "What is the trend of the technology industry?",
+      "output": "Question 1: What is the trend of the technology industry? paradigm shift towards non-linearity [Annual Report 2024\u201325, Page 84]",
+      "retrieval_hit": false,
+      "precision": 0.26666666666666666,
+      "recall": 0.024844720496894408,
+      "f1": 0.04545454545454545
+    },
+    {
+      "id": 16,
+      "query": "What is the name of the company that records ce/r_t.ligaain financial assets and liabilities at fair v?",
+      "output": "Question 1: What is the name of the company that records ce/r_t.ligaain financial assets and liabilities at fair v? The Company [Annual Report 2024\u201325, Page 352]",
+      "retrieval_hit": false,
+      "precision": 0.5789473684210527,
+      "recall": 0.10891089108910891,
+      "f1": 0.18333333333333335
+    },
+    {
+      "id": 17,
+      "query": "What is the name of the project that was launched by the Blue Cross of India?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.02) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.1875,
+      "recall": 0.022388059701492536,
+      "f1": 0.04
+    },
+    {
+      "id": 18,
+      "query": "What is the highest cumulative TSR among peer group for the past decade?",
+      "output": "Question 1: What is the highest cumulative TSR among peer group for the past decade? T otal Contract Value (TCV) in net new deal wins $9.3B Consolidated revenue 4.7% YoY (CC) $13.8B Only service provider to be rated Customers\u2019 Choice in 4 out of 5 Ga/r_t.liganer Peer Insights Voice of the Customer (VoC) repo/r_t.ligas across IT services markets (as of April 2025) [Annual Report 2024\u201325, Page 78]",
+      "retrieval_hit": true,
+      "precision": 0.8936170212765957,
+      "recall": 0.6268656716417911,
+      "f1": 0.7368421052631579
+    },
+    {
+      "id": 19,
+      "query": "What is the name of the company that contributed /uni20B91,180 crores towards other defined contribution plans of subsidiaries outside India?",
+      "output": "Question 1: What is the name of the company that contributed /uni20B91,180 crores towards other defined contribution plans of subsidiaries outside India? Vama Sundari Investments (Delhi) Priv [Annual Report 2024\u201325, Page 400]",
+      "retrieval_hit": false,
+      "precision": 0.5357142857142857,
+      "recall": 0.14150943396226415,
+      "f1": 0.22388059701492535
+    },
+    {
+      "id": 20,
+      "query": "What is the name of the company that conducts business continuity exercises?",
+      "output": "Question 1: What is the name of the company that conducts business continuity exercises? According to the report on page 237: 229 HCLTech Annual Repo/r_t.liga 2024-25 \u25cf Ba/t_t.ligale hardened Business Continuity & Disaster Recovery Plans including Cyber Incident readiness \u25cf Geographically dispersed Data Centers \u25cf Robust multi-vendor MPLS & Internet Network \u25cf Scalable Work from Home (WFH) Computing capability with stringent... [Annual Report 2024\u201325, Page 237]",
+      "retrieval_hit": true,
+      "precision": 0.88,
+      "recall": 0.2603550295857988,
+      "f1": 0.4018264840182649
+    },
+    {
+      "id": 21,
+      "query": "What is the purpose of the project?",
+      "output": "Question 1: What is the purpose of the project? to provide awareness sessions, mass campaigns, health-camps, soap banks and other crucial activities to create a safe, healthy, and suppo/r_t.ligaive environment for school children [Annual Report 2024\u201325, Page 143]",
+      "retrieval_hit": false,
+      "precision": 0.3939393939393939,
+      "recall": 0.08496732026143791,
+      "f1": 0.13978494623655913
+    },
+    {
+      "id": 22,
+      "query": "What is the Code of Ethics of the Institute of Cha/r_t.ligaered Accountants of India?",
+      "output": "Question 1: What is the Code of Ethics of the Institute of Cha/r_t.ligaered Accountants of India? Code of Ethics [Annual Report 2024\u201325, Page 252]",
+      "retrieval_hit": true,
+      "precision": 0.5625,
+      "recall": 0.08490566037735849,
+      "f1": 0.14754098360655737
+    },
+    {
+      "id": 23,
+      "query": "What is the name of the company that launched HCL Software?",
+      "output": "Question 1: What is the name of the company that launched HCL Software? HCL Software [Annual Report 2024\u201325, Page 71]",
+      "retrieval_hit": false,
+      "precision": 0.3076923076923077,
+      "recall": 0.024242424242424242,
+      "f1": 0.0449438202247191
+    },
+    {
+      "id": 24,
+      "query": "What is the name of the company that is primarily engaged in providing IT and business services, engineering and R&D services and modernized software products and IP-led offerings?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.00) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.008,
+      "f1": 0.014184397163120567
+    },
+    {
+      "id": 25,
+      "query": "What is the name of the organization that has adopted a web-based application for transmi/t_t.ligaing Board/Commi/t_t.ligaee Agenda(s)?",
+      "output": "Question 1: What is the name of the organization that has adopted a web-based application for transmi/t_t.ligaing Board/Commi/t_t.ligaee Agenda(s)? According to the report on page 161: 154Corporate Governance Repo/r_t.liga Meeting material/agenda distributed in advance Meetings are governed by the structured agenda. The agenda for each Board/ Commi/t_t.ligaee meetings is circulated in advance to the directors. The agenda items are backed by the comprehensive background information... [Annual Report 2024\u201325, Page 161]",
+      "retrieval_hit": true,
+      "precision": 0.7608695652173914,
+      "recall": 0.36082474226804123,
+      "f1": 0.48951048951048953
+    },
+    {
+      "id": 26,
+      "query": "What is the name of the group that formally documents all relationships between hedging instruments and hedged items?",
+      "output": "Question 1: What is the name of the group that formally documents all relationships between hedging instruments and hedged items? The Group [Annual Report 2024\u201325, Page 354]",
+      "retrieval_hit": true,
+      "precision": 0.6190476190476191,
+      "recall": 0.14285714285714285,
+      "f1": 0.23214285714285715
+    },
+    {
+      "id": 27,
+      "query": "What is the percentage of the number of people who are not employees?",
+      "output": "Question 1: What is the percentage of the number of people who are not employees? According to the report on page 215: 62,381 100% Others 62 62 100% 63 63 100% Total 214,698 214,698 100% 214,560 214,560 100% Workers Male Not ApplicableFemale Total Note: \u25cf Eligible employees are considered in Total Employees. \u25cf The entire personnel of HCLTech are categorized as \u2018Employees\u2019 and not as \u2018Workers\u2019. Therefore, the informa... [Annual Report 2024\u201325, Page 215]",
+      "retrieval_hit": true,
+      "precision": 0.6666666666666666,
+      "recall": 0.27906976744186046,
+      "f1": 0.3934426229508197
+    },
+    {
+      "id": 28,
+      "query": "What is the total number of non-current liabilities in the United States?",
+      "output": "Question 1: What is the total number of non-current liabilities in the United States? According to the report on page 117: Current and other non\u2013current assets, excluding treasury assets increased by \u20b92,088 crores to \u20b923,251 crores as of 31 March 2025 from \u20b921,163 crores as of 31 March 2024; the increase is primarily on account of increase in trade receivables by \u20b92,656 crores. Current and non-current liabilities \u201cNon-c... [Annual Report 2024\u201325, Page 117]",
+      "retrieval_hit": false,
+      "precision": 0.37142857142857144,
+      "recall": 0.09027777777777778,
+      "f1": 0.14525139664804468
+    },
+    {
+      "id": 29,
+      "query": "What is the term for the term for the term for the term for the term for the term for the term for the term for the term for the term for the term for the term for the term for the term for the term for the term",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.01) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.007518796992481203,
+      "f1": 0.013422818791946308
+    },
+    {
+      "id": 30,
+      "query": "What is the name of the organization that is responsible for the redressal mechanism in place?",
+      "output": "Question 1: What is the name of the organization that is responsible for the redressal mechanism in place? HCLTech Annual Repo/r_t.liga 2024-25 Stakeholder group from whom complaint is received Grievance Redressal Mechanism in Place (Y es/No), If yes, then provide weblink for grievance redressal policy FY 2024-25 FY 2023-24 Number of complaints filed during the year Number of complaints pending resolution at close of the year Remarks Employees and workers Yes h/t_t.ligaps [Annual Report 2024\u201325, Page 193]",
+      "retrieval_hit": true,
+      "precision": 0.851063829787234,
+      "recall": 0.28169014084507044,
+      "f1": 0.4232804232804233
+    },
+    {
+      "id": 31,
+      "query": "What is the name of the company that maintains the annual return of the Company for FY 2024-25?",
+      "output": "Question 1: What is the name of the company that maintains the annual return of the Company for FY 2024-25? According to the report on page 123: of the Company. 16. Maintenance of Cost Records The maintenance of cost records and the requirement of a cost audit as prescribed by the Central Government under the provisions of Section 148 of the Act are not applicable to the business activities carried out by the Company. Accordingly, such cost... [Annual Report 2024\u201325, Page 123]",
+      "retrieval_hit": true,
+      "precision": 0.7894736842105263,
+      "recall": 0.22900763358778625,
+      "f1": 0.3550295857988166
+    },
+    {
+      "id": 32,
+      "query": "What is the main reason for the acquisition of cert?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.00) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.007518796992481203,
+      "f1": 0.013422818791946308
+    },
+    {
+      "id": 33,
+      "query": "What is the name of the company that is a subsidiary of Ind AS?",
+      "output": "Question 1: What is the name of the company that is a subsidiary of Ind AS? Share Capital(/uni20B9) 1 HCL Great Britain Limited 111 2 Axon Solutions Limited 107 3 Confinale (UK) Limited 107 4 HCL T echnologies Corporate Services Limited 85 5 Actian Australia Pty Ltd 53 6 Actian Europe Limited 107 7 Actian International, Inc. 86 [Annual Report 2024\u201325, Page 422]",
+      "retrieval_hit": false,
+      "precision": 0.14285714285714285,
+      "recall": 0.04032258064516129,
+      "f1": 0.06289308176100629
+    },
+    {
+      "id": 34,
+      "query": "What is the name of the development project that was launched in the year 2020?",
+      "output": "Question 1: What is the name of the development project that was launched in the year 2020? According to the report on page 145: 138Directors\u2019 Repo/r_t.liga Project Name 40. Services & Infrastructural Strengthening under Integrated Child Development Services (\u201cICDS\u201d) for Addressing Health, Nutrition and the Development Needs of Young Girls & Boys Implemented By Save the Children (FY 2021-22) Impact Assessment Agency PwC Locat... [Annual Report 2024\u201325, Page 145]",
+      "retrieval_hit": false,
+      "precision": 0.3695652173913043,
+      "recall": 0.1069182389937107,
+      "f1": 0.16585365853658537
+    },
+    {
+      "id": 35,
+      "query": "What is the name of the organization that is responsible for the development of the Indian economy?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.04) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.015873015873015872,
+      "f1": 0.02531645569620253
+    },
+    {
+      "id": 36,
+      "query": "What is the name of the Act that gives a true and fair view of the consolidated state of affairs, consolidated profit/loss and other comprehensive income?",
+      "output": "Question 1: What is the name of the Act that gives a true and fair view of the consolidated state of affairs, consolidated profit/loss and other comprehensive income? According to the report on page 330: requirements of the Act that give a true and fair view of the consolidated state of affairs, consolidated profit/loss and other comprehensive income, consolidated statement of changes in equity and consolidated cash flows of the Group in accordance with the accounting principles generally accepted i... [Annual Report 2024\u201325, Page 330]",
+      "retrieval_hit": true,
+      "precision": 0.7435897435897436,
+      "recall": 0.23770491803278687,
+      "f1": 0.36024844720496896
+    },
+    {
+      "id": 37,
+      "query": "What is the name of the company that has a subsidiary in the company?",
+      "output": "Question 1: What is the name of the company that has a subsidiary in the company? Share Capital(/uni20B9) 1 HCL Great Britain Limited 111 2 Axon Solutions Limited 107 3 Confinale (UK) Limited 107 4 HCL T echnologies Corporate Services Limited 85 5 Actian Australia Pty Ltd 53 6 Actian Europe Limited 107 7 Actian International, Inc. 86 [Annual Report 2024\u201325, Page 422]",
+      "retrieval_hit": false,
+      "precision": 0.45714285714285713,
+      "recall": 0.21052631578947367,
+      "f1": 0.2882882882882883
+    },
+    {
+      "id": 38,
+      "query": "What is the name of the company that is a member of the Board?",
+      "output": "Question 1: What is the name of the company that is a member of the Board? According to the report on page 155: the other stakeholders. This is reflected in the Company\u2019s governance practices, through which it strives to maintain an active, informed and independent Board. The Board ensures that the Company complies with all relevant laws, regulations, governance practices, secretarial, accounting and auditing... [Annual Report 2024\u201325, Page 155]",
+      "retrieval_hit": false,
+      "precision": 0.34210526315789475,
+      "recall": 0.0896551724137931,
+      "f1": 0.14207650273224043
+    },
+    {
+      "id": 39,
+      "query": "What is the yearly profit of the company?",
+      "output": "Question 1: What is the yearly profit of the company? 590 544 R&D expenditure as a percentage of revenues 1.15% 1.13% D [Annual Report 2024\u201325, Page 154]",
+      "retrieval_hit": false,
+      "precision": 0.25,
+      "recall": 0.024844720496894408,
+      "f1": 0.04519774011299435
+    },
+    {
+      "id": 40,
+      "query": "What is the name of the company that has equity interest of 68,271 and 100% dividend rights and control?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.05) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.008849557522123894,
+      "f1": 0.015503875968992248
+    },
+    {
+      "id": 41,
+      "query": "What is the name of the company that broadcasts the qua/r_t.ligaerly results?",
+      "output": "I could not find this information in the dataset.",
+      "retrieval_hit": false,
+      "precision": 0.42857142857142855,
+      "recall": 0.024,
+      "f1": 0.045454545454545456
+    },
+    {
+      "id": 42,
+      "query": "What is the name of the company that is responsible for the protection of human rights?",
+      "output": "I could not find this information in the dataset.",
+      "retrieval_hit": false,
+      "precision": 0.2857142857142857,
+      "recall": 0.03571428571428571,
+      "f1": 0.06349206349206349
+    },
+    {
+      "id": 43,
+      "query": "What is the name of the subsidiary company that has a subsidiary in the country that has a subsidiary in the country that has a subsidiary in the country that has a subsidiary in the country that has a subsidiary in the country that",
+      "output": "Question 1: What is the name of the subsidiary company that has a subsidiary in the country that has a subsidiary in the country that has a subsidiary in the country that has a subsidiary in the country that has a subsidiary in the country that CeleritiFintech Limited Subsidiar [Annual Report 2024\u201325, Page 189]",
+      "retrieval_hit": false,
+      "precision": 0.29411764705882354,
+      "recall": 0.08620689655172414,
+      "f1": 0.13333333333333333
+    },
+    {
+      "id": 44,
+      "query": "What is the main reason for HCLTech's success?",
+      "output": "Question 1: What is the main reason for HCLTech's success? a strategic blend of factors [Annual Report 2024\u201325, Page 67]",
+      "retrieval_hit": false,
+      "precision": 0.3333333333333333,
+      "recall": 0.03937007874015748,
+      "f1": 0.07042253521126761
+    },
+    {
+      "id": 45,
+      "query": "What is the percentage of the total amount of the otal Gross block as at 31 March 2024?",
+      "output": "Question 1: What is the percentage of the total amount of the otal Gross block as at 31 March 2024? According to the report on page 362: 354Consolidated Financial Statements Notes to consolidated financial statements for the year ended 31 March 2025 (All amounts in crores of /uni20B9, except share data and as stated otherwise) The changes in the carrying value for the year ended 31 March 2024 Software T echnology (including Licensed... [Annual Report 2024\u201325, Page 362]",
+      "retrieval_hit": true,
+      "precision": 0.7857142857142857,
+      "recall": 0.25984251968503935,
+      "f1": 0.3905325443786983
+    },
+    {
+      "id": 46,
+      "query": "What is the oppo/r_t.ligaunity for HCLTech?",
+      "output": "Question 1: What is the oppo/r_t.ligaunity for HCLTech? oppo/r_t.ligaunity [Annual Report 2024\u201325, Page 12]",
+      "retrieval_hit": false,
+      "precision": 0.5,
+      "recall": 0.041666666666666664,
+      "f1": 0.07692307692307693
+    },
+    {
+      "id": 47,
+      "query": "What is the name of the organization that has conducted third-pa/r_t.ligay inspections?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.00) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.023529411764705882,
+      "f1": 0.039603960396039604
+    },
+    {
+      "id": 48,
+      "query": "What is the purpose of the project?",
+      "output": "Question 1: What is the purpose of the project? to provide awareness sessions, mass campaigns, health-camps, soap banks and other crucial activities to create a safe, healthy, and suppo/r_t.ligaive environment for school children [Annual Report 2024\u201325, Page 143]",
+      "retrieval_hit": false,
+      "precision": 0.12121212121212122,
+      "recall": 0.032520325203252036,
+      "f1": 0.05128205128205129
+    },
+    {
+      "id": 49,
+      "query": "What is the total number of ordinary shares of Sri Lankan Rupees 10 each in HCL T echnologies Lanka (Priva)?",
+      "output": "Question 1: What is the total number of ordinary shares of Sri Lankan Rupees 10 each in HCL T echnologies Lanka (Priva)? 30,000,000 (31 March 2024, 30,000,000) equity shares of GBP 1 each fully paid up, in HCL EAS Limited 225 225 1,751,301 (31 March 2024, 1,751,301) equity shares of /uni20B910 each in HCL T raining & Staffing Services Private Limited 2 2 100,000 (31 March 2024, 100,000) equity shares of SGD 1 each, in HCL Asia Pacific Pte. [Annual Report 2024\u201325, Page 286]",
+      "retrieval_hit": true,
+      "precision": 0.7804878048780488,
+      "recall": 0.367816091954023,
+      "f1": 0.5
+    },
+    {
+      "id": 50,
+      "query": "What is the name of the company that receives benefits under the provident fund?",
+      "output": "Question 1: What is the name of the company that receives benefits under the provident fund? According to the report on page 351: more unce/r_t.ligaain future events not wholly within the control of the Group or a present obligation that arises from past events where it is either not probable that an outflow of resources will be required to se/t_t.ligale the obligation or a reliable estimate of the amount cannot be made. Conti... [Annual Report 2024\u201325, Page 351]",
+      "retrieval_hit": true,
+      "precision": 0.7708333333333334,
+      "recall": 0.2846153846153846,
+      "f1": 0.41573033707865165
+    },
+    {
+      "id": 51,
+      "query": "What is the percentage of the net income of the company that is ranked highest in the IT sector?",
+      "output": "Question 1: What is the percentage of the net income of the company that is ranked highest in the IT sector? According to the report on page 11: balance sheet remained very healthy, driven by efficient capital management and cost controls. During FY25, ROIC was 37.9%, up 4.1%, and comparable to the best in the industry. The Operating Cash Flow to Net Income conversion was 129%, while Free Cash Flow to Net Income conversion was 123%. Diluted... [Annual Report 2024\u201325, Page 11]",
+      "retrieval_hit": true,
+      "precision": 0.7954545454545454,
+      "recall": 0.3153153153153153,
+      "f1": 0.45161290322580655
+    },
+    {
+      "id": 52,
+      "query": "What is the name of the company that is headquartered in the United States?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.00) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.010582010582010581,
+      "f1": 0.01951219512195122
+    },
+    {
+      "id": 53,
+      "query": "What is the percentage of the tax in India that is not taxable?",
+      "output": "Question 1: What is the percentage of the tax in India that is not taxable? 34.94% 34.94% [Annual Report 2024\u201325, Page 376]",
+      "retrieval_hit": true,
+      "precision": 0.5,
+      "recall": 0.05343511450381679,
+      "f1": 0.09655172413793103
+    },
+    {
+      "id": 54,
+      "query": "What is the purpose of the audit?",
+      "output": "Question 1: What is the purpose of the audit? to obtain reasonable assurance about whether adequate internal financial controls with reference to financial statements were established and maintained and if such controls operated effectively in all material respects [Annual Report 2024\u201325, Page 333]",
+      "retrieval_hit": false,
+      "precision": 0.3125,
+      "recall": 0.06535947712418301,
+      "f1": 0.10810810810810811
+    },
+    {
+      "id": 55,
+      "query": "What is the name of the company that has been declaring qua/r_t.ligaerly dividend for 22 years?",
+      "output": "Question 1: What is the name of the company that has been declaring qua/r_t.ligaerly dividend for 22 years? HCL Holdings Private Limited [Annual Report 2024\u201325, Page 292]",
+      "retrieval_hit": true,
+      "precision": 0.5416666666666666,
+      "recall": 0.11711711711711711,
+      "f1": 0.1925925925925926
+    },
+    {
+      "id": 56,
+      "query": "What is the name of the company that has been awarded the Global Sustainability Yearbook for the third year in a row?",
+      "output": "Question 1: What is the name of the company that has been awarded the Global Sustainability Yearbook for the third year in a row? EcoVadis [Annual Report 2024\u201325, Page 22]",
+      "retrieval_hit": false,
+      "precision": 0.6666666666666666,
+      "recall": 0.0915032679738562,
+      "f1": 0.16091954022988506
+    },
+    {
+      "id": 57,
+      "query": "What is the purpose of the audit trail facility?",
+      "output": "Question 1: What is the purpose of the audit trail facility? for all relevant transactions recorded in the software [Annual Report 2024\u201325, Page 332]",
+      "retrieval_hit": false,
+      "precision": 0.6111111111111112,
+      "recall": 0.09090909090909091,
+      "f1": 0.15827338129496402
+    },
+    {
+      "id": 58,
+      "query": "What is the name of the company that oversees the IP Management Council?",
+      "output": "Question 1: What is the name of the company that oversees the IP Management Council? HCLSoftware [Annual Report 2024\u201325, Page 71]",
+      "retrieval_hit": true,
+      "precision": 0.42857142857142855,
+      "recall": 0.033707865168539325,
+      "f1": 0.06249999999999999
+    },
+    {
+      "id": 59,
+      "query": "What is the name of the subsidiary company that has a subsidiary in the company?",
+      "output": "Question 1: What is the name of the subsidiary company that has a subsidiary in the company? Share Capital(/uni20B9) 1 HCL Great Britain Limited 111 2 Axon Solutions Limited 107 3 Confinale (UK) Limited 107 4 HCL T echnologies Corporate Services Limited 85 5 Actian Australia Pty Ltd 53 6 Actian Europe Limited 107 7 Actian International, Inc. 86 [Annual Report 2024\u201325, Page 422]",
+      "retrieval_hit": false,
+      "precision": 0.37142857142857144,
+      "recall": 0.1111111111111111,
+      "f1": 0.17105263157894737
+    },
+    {
+      "id": 60,
+      "query": "What is the name of the company that has a subsidiary?",
+      "output": "Question 1: What is the name of the company that has a subsidiary? Share Capital(/uni20B9) 1 HCL Great Britain Limited 111 2 Axon Solutions Limited 107 3 Confinale (UK) Limited 107 4 HCL T echnologies Corporate Services Limited 85 5 Actian Australia Pty Ltd 53 6 Actian Europe Limited 107 7 Actian International, Inc. 86 [Annual Report 2024\u201325, Page 422]",
+      "retrieval_hit": false,
+      "precision": 0.2,
+      "recall": 0.04827586206896552,
+      "f1": 0.07777777777777778
+    },
+    {
+      "id": 61,
+      "query": "What is the average monthly rent payment for the year ending 31 March 2025?",
+      "output": "Question 1: What is the average monthly rent payment for the year ending 31 March 2025? According to the report on page 109: on account of interest cost on lease liabilities and working capital management. Depreciation and amortization expense Depreciation and amortization expense decreased by 2.1% to \u20b94,084 crores in the year ended 31 March 2025 from \u20b94,173 crores in the year ended 31 March 2024. This reduction is primar... [Annual Report 2024\u201325, Page 109]",
+      "retrieval_hit": false,
+      "precision": 0.38461538461538464,
+      "recall": 0.11811023622047244,
+      "f1": 0.1807228915662651
+    },
+    {
+      "id": 62,
+      "query": "What is the name of the company that has only one class of shares referred to as equity shares having a par value of /uni20B92/-?",
+      "output": "Question 1: What is the name of the company that has only one class of shares referred to as equity shares having a par value of /uni20B92/-? The Company has only one class of shares referred to as equity shares having a par value of /uni20B92/-. Each holder of equity shares is entitled to one vote per share. In the event of liquidation of the Company, the holders of equity shares will be entitled to receive the remaining assets of the Company, after distribution of all preferential amounts. The distribution will be in propo/r_t.ligaion to the number of equity shares [Annual Report 2024\u201325, Page 366]",
+      "retrieval_hit": false,
+      "precision": 0.8636363636363636,
+      "recall": 0.336283185840708,
+      "f1": 0.4840764331210191
+    },
+    {
+      "id": 63,
+      "query": "What is the name of the organization that was established in the year 2001?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.00) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.005988023952095809,
+      "f1": 0.01092896174863388
+    },
+    {
+      "id": 64,
+      "query": "What is the name of the company that develops R&D initiatives?",
+      "output": "Question 1: What is the name of the company that develops R&D initiatives? According to the report on page 151: 144Directors\u2019 Repo/r_t.liga These initiatives are integral to organization\u2019s overall strategy for growth, efficiency and innovation. These initiatives not only streamline operations but also foster a culture of innovation and responsiveness to evolving business needs. C) Research and Development (\u201cR... [Annual Report 2024\u201325, Page 151]",
+      "retrieval_hit": true,
+      "precision": 0.7674418604651163,
+      "recall": 0.1813186813186813,
+      "f1": 0.29333333333333333
+    },
+    {
+      "id": 65,
+      "query": "What is the name of the organization that is responsible for the sexual harassment of women at workplace?",
+      "output": "Question 1: What is the name of the organization that is responsible for the sexual harassment of women at workplace? Global Ethics Helpline [Annual Report 2024\u201325, Page 228]",
+      "retrieval_hit": true,
+      "precision": 0.55,
+      "recall": 0.08461538461538462,
+      "f1": 0.14666666666666667
+    },
+    {
+      "id": 66,
+      "query": "What is the percentage of the total income of the company that is reclassified to the statement of pr?",
+      "output": "Question 1: What is the percentage of the total income of the company that is reclassified to the statement of pr? According to the report on page 263: 255 HCL T ech Annual Repo/r_t.liga 2024-25 Note No. Year ended 31 March 2025 31 March 2024 I Revenue Revenue from operations 3.21 51,105 48,118 Other income 3.22 1,234 1,076 Total income 52,339 49,194 II Expenses Purchase of stock-in-trade 133 135 Changes in inventories of stock-in-trade 3.23 13 10... [Annual Report 2024\u201325, Page 263]",
+      "retrieval_hit": true,
+      "precision": 0.8444444444444444,
+      "recall": 0.22485207100591717,
+      "f1": 0.3551401869158879
+    },
+    {
+      "id": 67,
+      "query": "What is the value creation model?",
+      "output": "Question 1: What is the value creation model? According to the report on page 64: Value Creation Model Inputs Outputs Shareholders fund \u20b969,655Cr Borrowings \u20b92,291Cr Financial CapitalNatural Capital Social and Relationship Capital Strategy and process Medium-term strategic objectives Driven by full-stack po/r_t.ligafolio and well-defined strategic objectives to create value for o... [Annual Report 2024\u201325, Page 64]",
+      "retrieval_hit": true,
+      "precision": 0.8205128205128205,
+      "recall": 0.4050632911392405,
+      "f1": 0.5423728813559322
+    },
+    {
+      "id": 68,
+      "query": "What is the main reason for the reduction in energy consumption?",
+      "output": "Question 1: What is the main reason for the reduction in energy consumption? energy efficiency initiatives [Annual Report 2024\u201325, Page 77]",
+      "retrieval_hit": true,
+      "precision": 0.6,
+      "recall": 0.06206896551724138,
+      "f1": 0.11249999999999999
+    },
+    {
+      "id": 69,
+      "query": "What is the name of the company that has been a part of the project?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.10) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.012345679012345678,
+      "f1": 0.02247191011235955
+    },
+    {
+      "id": 70,
+      "query": "What is the name of the company that is a member of the Auditor\u2019s Repo/r_t.liga?",
+      "output": "Question 1: What is the name of the company that is a member of the Auditor\u2019s Repo/r_t.liga? HCL Technologies Limited [Annual Report 2024\u201325, Page 131]",
+      "retrieval_hit": false,
+      "precision": 0.3157894736842105,
+      "recall": 0.05825242718446602,
+      "f1": 0.09836065573770493
+    },
+    {
+      "id": 71,
+      "query": "What is the name of the company that is a subsidiary of the company?",
+      "output": "Question 1: What is the name of the company that is a subsidiary of the company? Share Capital(/uni20B9) 1 HCL Great Britain Limited 111 2 Axon Solutions Limited 107 3 Confinale (UK) Limited 107 4 HCL T echnologies Corporate Services Limited 85 5 Actian Australia Pty Ltd 53 6 Actian Europe Limited 107 7 Actian International, Inc. 86 [Annual Report 2024\u201325, Page 422]",
+      "retrieval_hit": false,
+      "precision": 0.058823529411764705,
+      "recall": 0.01652892561983471,
+      "f1": 0.025806451612903226
+    },
+    {
+      "id": 72,
+      "query": "What is the name of the company that won multiple significant deals spanning end-to-end managed services?",
+      "output": "Question 1: What is the name of the company that won multiple significant deals spanning end-to-end managed services? Digital Process Operations (DPO) [Annual Report 2024\u201325, Page 81]",
+      "retrieval_hit": true,
+      "precision": 0.6363636363636364,
+      "recall": 0.09090909090909091,
+      "f1": 0.1590909090909091
+    },
+    {
+      "id": 73,
+      "query": "What is the name of the company that has rolled out a new COBEC Policy?",
+      "output": "Question 1: What is the name of the company that has rolled out a new COBEC Policy? According to the report on page 170: (\u201cCOBEC\u201d) Policy that provides for transparency, ethical conduct, a friendly workplace, legal compliance and protection of Company\u2019s prope/r_t.ligay and information. This year, the Company has rolled out a new COBEC Policy which is available on website of the Company in English and 14 different lang... [Annual Report 2024\u201325, Page 170]",
+      "retrieval_hit": true,
+      "precision": 0.8048780487804879,
+      "recall": 0.2727272727272727,
+      "f1": 0.4074074074074074
+    },
+    {
+      "id": 74,
+      "query": "What is the purpose of the project?",
+      "output": "Question 1: What is the purpose of the project? to provide awareness sessions, mass campaigns, health-camps, soap banks and other crucial activities to create a safe, healthy, and suppo/r_t.ligaive environment for school children [Annual Report 2024\u201325, Page 143]",
+      "retrieval_hit": true,
+      "precision": 0.7575757575757576,
+      "recall": 0.15151515151515152,
+      "f1": 0.25252525252525254
+    },
+    {
+      "id": 75,
+      "query": "What is the name of the organization that has a positive impact on creativity, problem solving and overall organizational success?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.07) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.006622516556291391,
+      "f1": 0.011976047904191616
+    },
+    {
+      "id": 76,
+      "query": "What is the name of the company that estimates the fair value of stock options using option pricing model?",
+      "output": "Question 1: What is the name of the company that estimates the fair value of stock options using option pricing model? The Company [Annual Report 2024\u201325, Page 352]",
+      "retrieval_hit": true,
+      "precision": 0.6,
+      "recall": 0.11214953271028037,
+      "f1": 0.1889763779527559
+    },
+    {
+      "id": 77,
+      "query": "What is the name of the organization that is responsible for the re-evaluation of the business?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.03) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.013422818791946308,
+      "f1": 0.02424242424242424
+    },
+    {
+      "id": 78,
+      "query": "What is the name of the company that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has",
+      "output": "Question 1: What is the name of the company that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has a subsidiary that has C3i Services &Technologies (Dalian) Co., Ltd [Annual Report 2024\u201325, Page 189]",
+      "retrieval_hit": false,
+      "precision": 0.2777777777777778,
+      "recall": 0.043478260869565216,
+      "f1": 0.07518796992481204
+    },
+    {
+      "id": 79,
+      "query": "What is the name of the director at the Board Meetings held during FY 2024-25?",
+      "output": "Question 1: What is the name of the director at the Board Meetings held during FY 2024-25? Ms. Vanitha Narayanan [Annual Report 2024\u201325, Page 157]",
+      "retrieval_hit": false,
+      "precision": 0.6875,
+      "recall": 0.1134020618556701,
+      "f1": 0.19469026548672566
+    },
+    {
+      "id": 80,
+      "query": "What is the criticality of the New Vistas locations in India?",
+      "output": "Question 1: What is the criticality of the New Vistas locations in India? Building the next level talent at scale and at the right cost [Annual Report 2024\u201325, Page 87]",
+      "retrieval_hit": true,
+      "precision": 0.75,
+      "recall": 0.08064516129032258,
+      "f1": 0.14563106796116504
+    },
+    {
+      "id": 81,
+      "query": "What is the name of the company that has no fu/r_t.ligaher obligations to the s?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.21) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.007518796992481203,
+      "f1": 0.013422818791946308
+    },
+    {
+      "id": 82,
+      "query": "What year did the Board of Directors present the 33rd Directors\u2019 Repo/r_t.liga of HCL Technologies Limited (\u201cHCLTech\u201d)?",
+      "output": "Question 1: What year did the Board of Directors present the 33rd Directors\u2019 Repo/r_t.liga of HCL Technologies Limited (\u201cHCLTech\u201d)? According to the report on page 183: 176Corporate Governance Repo/r_t.liga DECLARATION BY CHIEF EXECUTIVE OFFICER PURSUANT TO REGULATION 34(3) AND SCHEDULE V OF THE SEBI (LISTING OBLIGATIONS AND DISCLOSURE REQUIREMENTS) REGULATIONS, 2015 We, Roshni Nadar Malhotra, Chairperson and C. Vijayakumar, Chief Executive Officer & Managing Direc... [Annual Report 2024\u201325, Page 183]",
+      "retrieval_hit": false,
+      "precision": 0.32608695652173914,
+      "recall": 0.10067114093959731,
+      "f1": 0.15384615384615385
+    },
+    {
+      "id": 83,
+      "query": "What is the name of the organization that has received the coveted designation of Ethisphere\u2019s 2025 World\u2019s Most Ethical Companies?",
+      "output": "Question 1: What is the name of the organization that has received the coveted designation of Ethisphere\u2019s 2025 World\u2019s Most Ethical Companies? According to the report on page 171: 164Corporate Governance Repo/r_t.liga December 17, 2023 to the Company valid for a period of 3 years till December 16, 2026, and re-ce/r_t.ligaifiable fu/r_t.ligaher thereafter. HCLTech has received the coveted designation of Ethisphere\u2019s 2025 World\u2019s Most Ethical Companies\u00ae, for the second consecut... [Annual Report 2024\u201325, Page 171]",
+      "retrieval_hit": true,
+      "precision": 0.7441860465116279,
+      "recall": 0.20382165605095542,
+      "f1": 0.32
+    },
+    {
+      "id": 84,
+      "query": "What is the name of the company that held the AC meetings?",
+      "output": "Question 1: What is the name of the company that held the AC meetings? A/t_t.ligaendance details of the members at the AC meetings held during FY 2024-25 are as follows: Name of the Commi/t_t.ligaee Member Position No. of Commi/t_t.ligaee meetings held during Member's tenure No. of Commi/t_t.ligaee meetings held during Member's tenure No. of Commi/t_t.ligaee meetings [Annual Report 2024\u201325, Page 164]",
+      "retrieval_hit": false,
+      "precision": 0.6,
+      "recall": 0.10714285714285714,
+      "f1": 0.18181818181818182
+    },
+    {
+      "id": 85,
+      "query": "What is the smallest amount of assets in the company?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.04) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.006802721088435374,
+      "f1": 0.012269938650306749
+    },
+    {
+      "id": 86,
+      "query": "What is the name of the company that is launching AI/GenAI solutions?",
+      "output": "Question 1: What is the name of the company that is launching AI/GenAI solutions? ServiceNow [Annual Report 2024\u201325, Page 41]",
+      "retrieval_hit": false,
+      "precision": 0.2857142857142857,
+      "recall": 0.023255813953488372,
+      "f1": 0.04301075268817204
+    },
+    {
+      "id": 87,
+      "query": "What is the main reason for the opportunistic effect of the work environment?",
+      "output": "I could not find this information in the dataset.",
+      "retrieval_hit": false,
+      "precision": 0.42857142857142855,
+      "recall": 0.022556390977443608,
+      "f1": 0.04285714285714285
+    },
+    {
+      "id": 88,
+      "query": "What is the focus of the industry on revenue growth?",
+      "output": "Question 1: What is the focus of the industry on revenue growth? According to the report on page 11: Dear Shareholders, In FY25, HCLTech once again delivered industry-leading growth and maintained steady profitability despite continued uncertainty in the macro-economic and geopolitical environment. This marks the second consecutive year in which HCLTech has outperformed its comparable peers, unders... [Annual Report 2024\u201325, Page 11]",
+      "retrieval_hit": false,
+      "precision": 0.2558139534883721,
+      "recall": 0.06321839080459771,
+      "f1": 0.10138248847926269
+    },
+    {
+      "id": 89,
+      "query": "What is the name of the organization that has a global regulatory compliance framework?",
+      "output": "Question 1: What is the name of the organization that has a global regulatory compliance framework? According to the report on page 102: we periodically conduct climate risk analyses in line with TCFD recommendations to identify and disclose the process of identifying, assessing and managing climate-related risks. For more information, please refer to our Sustainability Report. Regulatory Compliance HCLTech operates in an ever-growin... [Annual Report 2024\u201325, Page 102]",
+      "retrieval_hit": true,
+      "precision": 0.782608695652174,
+      "recall": 0.3829787234042553,
+      "f1": 0.5142857142857143
+    },
+    {
+      "id": 90,
+      "query": "What is the smallest number of shares in the HCLTech Annual Repo/r_t.liga?",
+      "output": "Question 1: What is the smallest number of shares in the HCLTech Annual Repo/r_t.liga? According to the report on page 367: 359 HCLTech Annual Repo/r_t.liga 2024-25 Notes to consolidated financial statements for the year ended 31 March 2025 (All amounts in crores of /uni20B9, except share data and as stated otherwise) Details of shareholders holding more than 5 % shares in the company Name of the shareholder As at 31 Mar... [Annual Report 2024\u201325, Page 367]",
+      "retrieval_hit": false,
+      "precision": 0.5111111111111111,
+      "recall": 0.16428571428571428,
+      "f1": 0.24864864864864863
+    },
+    {
+      "id": 91,
+      "query": "What is the name of the company that is a subsidiary of the company?",
+      "output": "Question 1: What is the name of the company that is a subsidiary of the company? Share Capital(/uni20B9) 1 HCL Great Britain Limited 111 2 Axon Solutions Limited 107 3 Confinale (UK) Limited 107 4 HCL T echnologies Corporate Services Limited 85 5 Actian Australia Pty Ltd 53 6 Actian Europe Limited 107 7 Actian International, Inc. 86 [Annual Report 2024\u201325, Page 422]",
+      "retrieval_hit": false,
+      "precision": 0.2647058823529412,
+      "recall": 0.06716417910447761,
+      "f1": 0.10714285714285712
+    },
+    {
+      "id": 92,
+      "query": "What is the name of the company that uses AI to reimagine business processes?",
+      "output": "Question 1: What is the name of the company that uses AI to reimagine business processes? Digital Process Operations [Annual Report 2024\u201325, Page 44]",
+      "retrieval_hit": true,
+      "precision": 0.47058823529411764,
+      "recall": 0.047337278106508875,
+      "f1": 0.08602150537634408
+    },
+    {
+      "id": 93,
+      "query": "What is the smallest non-current assets?",
+      "output": "Question 1: What is the smallest non-current assets? treasury assets [Annual Report 2024\u201325, Page 117]",
+      "retrieval_hit": false,
+      "precision": 0.46153846153846156,
+      "recall": 0.05128205128205128,
+      "f1": 0.0923076923076923
+    },
+    {
+      "id": 94,
+      "query": "What is the name of the company that is most decorated in India\u2019s IT services company?",
+      "output": "Question 1: What is the name of the company that is most decorated in India\u2019s IT services company? India-headquartered IT services company [Annual Report 2024\u201325, Page 21]",
+      "retrieval_hit": true,
+      "precision": 0.6666666666666666,
+      "recall": 0.12987012987012986,
+      "f1": 0.21739130434782608
+    },
+    {
+      "id": 95,
+      "query": "What is the total number of outstanding RSUs?",
+      "output": "Question 1: What is the total number of outstanding RSUs? According to the report on page 368: exercised during the year was /uni20B91,552 (31 March 2024, /uni20B91,162) T otal number of RSUs outstanding include 1,257 ,655 (31 March 2024, 842,404) pe/r_f.ligaormance based RSUs, including those linked to relative pe/r_f.ligaormance parameters against select industry peers given to ce/r_t.ligaa... [Annual Report 2024\u201325, Page 368]",
+      "retrieval_hit": true,
+      "precision": 0.7857142857142857,
+      "recall": 0.275,
+      "f1": 0.40740740740740744
+    },
+    {
+      "id": 96,
+      "query": "What is the name of the company that acquired shares by the T rust?",
+      "output": "Question 1: What is the name of the company that acquired shares by the T rust? Vama Sundari Investments (Delhi) Private Limited [Annual Report 2024\u201325, Page 291]",
+      "retrieval_hit": true,
+      "precision": 0.6,
+      "recall": 0.15584415584415584,
+      "f1": 0.24742268041237114
+    },
+    {
+      "id": 97,
+      "query": "What is the name of the company that has been rated as the only service provider to be rated Customers\u2019 Choice in 4 out of 5?",
+      "output": "Question 1: What is the name of the company that has been rated as the only service provider to be rated Customers\u2019 Choice in 4 out of 5? Gartner Peer Insights Voice of the Customer (VoC) [Annual Report 2024\u201325, Page 87]",
+      "retrieval_hit": true,
+      "precision": 0.56,
+      "recall": 0.2978723404255319,
+      "f1": 0.3888888888888889
+    },
+    {
+      "id": 98,
+      "query": "What is the name of the company that has the most employees?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.26) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.125,
+      "recall": 0.024691358024691357,
+      "f1": 0.041237113402061855
+    },
+    {
+      "id": 99,
+      "query": "What is the percentage of profits and gains for the next five years?",
+      "output": "I am escalating this request to a human agent. Reason: I couldn't find enough reliable information (score: 0.00) in the dataset to answer this accurately.",
+      "retrieval_hit": false,
+      "precision": 0.0625,
+      "recall": 0.008064516129032258,
+      "f1": 0.014285714285714287
+    },
+    {
+      "id": 100,
+      "query": "What is the percentage of water intensity per rupee of turnover in India?",
+      "output": "Question 1: What is the percentage of water intensity per rupee of turnover in India? 0.71 0.67 [Annual Report 2024\u201325, Page 230]",
+      "retrieval_hit": true,
+      "precision": 0.5333333333333333,
+      "recall": 0.0975609756097561,
+      "f1": 0.16494845360824742
+    }
+  ]
+}

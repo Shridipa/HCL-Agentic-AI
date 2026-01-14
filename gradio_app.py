@@ -2,12 +2,11 @@ import gradio as gr
 import json
 import os
 import datetime
+import re
 from main_assistant import run_pipeline
 
-# Branded assets
 LOGO_PATH = r"C:\Users\KIIT\.gemini\antigravity\brain\a9629e95-b346-4d4d-b089-caf1bdf50c37\hcltech_assistant_logo_1767985807080.png"
 
-# Enhanced Custom CSS for the new layout
 CUSTOM_CSS = """
 .header-area {
     display: flex;
@@ -88,14 +87,11 @@ CUSTOM_CSS = """
 }
 """
 
-# Storage for tickets and meetings
 tickets_storage = []
 meetings_storage = []
 pending_actions = []
 
-# Helper functions for ticket management
 def format_pending_actions_display(actions):
-    """Format pending actions for the sidebar"""
     if not actions:
         return "<div class='empty-state'>✨ No pending actions.<br/>Ask the assistant to book something!</div>"
     
@@ -116,7 +112,6 @@ def format_pending_actions_display(actions):
     return html
 
 def confirm_action(index):
-    """Confirm a pending action and move it to permanent storage"""
     try:
         idx = int(index) - 1
         if 0 <= idx < len(pending_actions):
@@ -125,27 +120,25 @@ def confirm_action(index):
             
             if action_type == "schedule_meeting":
                 meetings_storage.append(action)
-                msg = f"✅ Meeting '{action.get('topic')}' confirmed and scheduled!"
+                msg = f"✅ Meeting '{action.get('topic')}' confirmed!"
             elif action_type == "create_ticket":
                 tickets_storage.append(action)
-                msg = f"✅ Ticket '{action.get('issue')}' confirmed and logged!"
+                msg = f"✅ Ticket '{action.get('issue')}' confirmed!"
             else:
                 msg = "✅ Action confirmed!"
                 
             return msg, format_pending_actions_display(pending_actions), format_meetings_display(meetings_storage), format_tickets_display(tickets_storage)
-        return "❌ Invalid action index", format_pending_actions_display(pending_actions), format_meetings_display(meetings_storage), format_tickets_display(tickets_storage)
+        return "❌ Invalid index", format_pending_actions_display(pending_actions), format_meetings_display(meetings_storage), format_tickets_display(tickets_storage)
     except:
-        return "❌ Error confirming action", format_pending_actions_display(pending_actions), format_meetings_display(meetings_storage), format_tickets_display(tickets_storage)
+        return "❌ Error", format_pending_actions_display(pending_actions), format_meetings_display(meetings_storage), format_tickets_display(tickets_storage)
 
 def clear_all_pending():
-    """Clear all pending actions"""
     pending_actions.clear()
-    return "🗑️ All pending actions cleared.", format_pending_actions_display(pending_actions)
+    return "🗑️ Cleared.", format_pending_actions_display(pending_actions)
 
 def format_tickets_display(tickets):
-    """Format tickets for display in the management tab"""
     if not tickets:
-        return "<div class='empty-state'>📂 No tickets booked yet.<br/>Use the chat or quick form to create one!</div>"
+        return "<div class='empty-state'>📂 No tickets.</div>"
     
     html = ""
     for idx, ticket in enumerate(tickets):
@@ -154,43 +147,37 @@ def format_tickets_display(tickets):
         <div class="ticket-card">
             <div class="card-header">
                 <span class="card-badge">#{idx + 1} - {ticket.get('department', 'IT')}</span>
-                <span style="background-color: {priority_color}; padding: 3px 8px; border-radius: 8px; font-size: 0.7rem;">
-                    {ticket.get('priority', 'Medium')}
-                </span>
+                <span style="background-color: {priority_color}; padding: 3px 8px; border-radius: 8px; font-size: 0.7rem;">{ticket.get('priority', 'Medium')}</span>
             </div>
             <div class="card-title">{ticket.get('issue', 'No description')}</div>
-            <div class="card-detail">📅 Created: {ticket.get('timestamp', 'N/A')}</div>
-            <div class="card-detail">🎫 Status: {ticket.get('status', 'Open')}</div>
+            <div class="card-detail">📅 {ticket.get('timestamp', 'N/A')}</div>
+            <div class="card-detail">Status: {ticket.get('status', 'Open')}</div>
         </div>
         """
     return html
 
 def format_meetings_display(meetings):
-    """Format meetings for display in the management tab"""
     if not meetings:
-        return "<div class='empty-state'>📅 No meetings scheduled yet.<br/>Use the chat or quick form to schedule one!</div>"
+        return "<div class='empty-state'>📅 No meetings.</div>"
     
     html = ""
     for idx, meeting in enumerate(meetings):
         html += f"""
         <div class="meeting-card">
             <div class="card-header">
-                <span class="card-badge">#{idx + 1} - Meeting</span>
-                <span style="background-color: rgba(255, 255, 255, 0.3); padding: 3px 8px; border-radius: 8px; font-size: 0.7rem;">
-                    {meeting.get('date_time', 'TBD')}
-                </span>
+                <span class="card-badge">#{idx + 1}</span>
+                <span style="background-color: rgba(255, 255, 255, 0.3); padding: 3px 8px; border-radius: 8px; font-size: 0.7rem;">{meeting.get('date_time', 'TBD')}</span>
             </div>
             <div class="card-title">{meeting.get('topic', 'No topic')}</div>
-            <div class="card-detail">👥 Participants: {meeting.get('participants', 'N/A')}</div>
-            <div class="card-detail">📍 Location: {meeting.get('location', 'Virtual')}</div>
+            <div class="card-detail">👥 {meeting.get('participants', 'N/A')}</div>
+            <div class="card-detail">📍 {meeting.get('location', 'Virtual')}</div>
         </div>
         """
     return html
 
 def book_ticket_quick(issue, department, priority):
-    """Quick book a ticket from the management tab"""
     if not issue.strip():
-        return "⚠️ Please provide an issue description", format_tickets_display(tickets_storage)
+        return "⚠️ Provide description", format_tickets_display(tickets_storage)
     
     ticket = {
         "action": "create_ticket",
@@ -201,12 +188,11 @@ def book_ticket_quick(issue, department, priority):
         "status": "Open"
     }
     tickets_storage.append(ticket)
-    return f"✅ Ticket #{len(tickets_storage)} booked successfully!", format_tickets_display(tickets_storage)
+    return f"✅ Ticket booked!", format_tickets_display(tickets_storage)
 
 def schedule_meeting_quick(topic, participants, date_time, location):
-    """Quick schedule a meeting from the management tab"""
     if not topic.strip():
-        return "⚠️ Please provide a meeting topic", format_meetings_display(meetings_storage)
+        return "⚠️ Provide topic", format_meetings_display(meetings_storage)
     
     meeting = {
         "action": "schedule_meeting",
@@ -217,65 +203,65 @@ def schedule_meeting_quick(topic, participants, date_time, location):
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
     }
     meetings_storage.append(meeting)
-    return f"📅 Meeting #{len(meetings_storage)} scheduled successfully!", format_meetings_display(meetings_storage)
+    return f"📅 Meeting scheduled!", format_meetings_display(meetings_storage)
 
 def delete_ticket(index):
-    """Delete a ticket by index"""
     try:
-        idx = int(index) - 1  # Convert to 0-based index
+        idx = int(index) - 1
         if 0 <= idx < len(tickets_storage):
             removed = tickets_storage.pop(idx)
-            return f"🗑️ Deleted ticket: {removed.get('issue', 'Unknown')}", format_tickets_display(tickets_storage)
-        return "❌ Invalid ticket number", format_tickets_display(tickets_storage)
-    except (ValueError, TypeError):
-        return "❌ Please enter a valid ticket number", format_tickets_display(tickets_storage)
+            return f"🗑️ Deleted: {removed.get('issue', 'Unknown')}", format_tickets_display(tickets_storage)
+        return "❌ Invalid", format_tickets_display(tickets_storage)
+    except:
+        return "❌ Error", format_tickets_display(tickets_storage)
 
 def delete_meeting(index):
-    """Delete a meeting by index"""
     try:
-        idx = int(index) - 1  # Convert to 0-based index
+        idx = int(index) - 1
         if 0 <= idx < len(meetings_storage):
             removed = meetings_storage.pop(idx)
-            return f"🗑️ Deleted meeting: {removed.get('topic', 'Unknown')}", format_meetings_display(meetings_storage)
-        return "❌ Invalid meeting number", format_meetings_display(meetings_storage)
-    except (ValueError, TypeError):
-        return "❌ Please enter a valid meeting number", format_meetings_display(meetings_storage)
+            return f"🗑️ Deleted: {removed.get('topic', 'Unknown')}", format_meetings_display(meetings_storage)
+        return "❌ Invalid", format_meetings_display(meetings_storage)
+    except:
+        return "❌ Error", format_meetings_display(meetings_storage)
 
-def refresh_tickets():
-    """Refresh the tickets display"""
-    return format_tickets_display(tickets_storage)
+def respond(message, history):
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": ""})
+    
+    yield "", history, format_pending_actions_display(pending_actions)
 
-def refresh_meetings():
-    """Refresh the meetings display"""
-    return format_meetings_display(meetings_storage)
-
-def process_interaction(query, history):
-    """Process user query through the main assistant"""
+    bot_msg_full = run_pipeline(message, history[:-2])
+    
+    words = bot_msg_full.split()
+    streaming_msg = ""
+    for i, word in enumerate(words):
+        streaming_msg += word + " "
+        history[-1]["content"] = streaming_msg
+        if i < 5 or i % 3 == 0 or i == len(words) - 1:
+            yield "", history, format_pending_actions_display(pending_actions)
+    
     try:
-        response = run_pipeline(query, history)
-        return response
-    except Exception as e:
-        return f"Error: {e}"
+        json_match = re.search(r'```json\s*\n(.*?)\n```', bot_msg_full, re.DOTALL)
+        if json_match:
+            action_json_str = json_match.group(1)
+            action_data = json.loads(action_json_str)
+            pending_actions.insert(0, action_data)
+            yield "", history, format_pending_actions_display(pending_actions)
+    except:
+        pass
 
-# Use a soft, friendly theme
 theme = gr.themes.Soft(
     primary_hue="blue",
     neutral_hue="slate",
     text_size="sm",
     font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui"]
-).set(
-    body_background_fill="#ffffff",
-    block_background_fill="#ffffff",
-    block_border_width="1px",
-    block_shadow="0 1px 2px 0 rgba(0, 0, 0, 0.05)"
 )
 
-with gr.Blocks(title="HCLTech Assistant") as demo:
-    
-    # Header Section
+with gr.Blocks(title="HCLTech Assistant", theme=theme, css=CUSTOM_CSS) as demo:
     with gr.Row(elem_classes="header-area"):
-        with gr.Column(scale=9, min_width=200):
-            gr.HTML(f"""
+        with gr.Column(scale=9):
+            gr.HTML("""
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div>
                         <h1 class="header-title">HCLTech Agentic Assistant</h1>
@@ -283,205 +269,83 @@ with gr.Blocks(title="HCLTech Assistant") as demo:
                     </div>
                 </div>
             """)
-        with gr.Column(scale=1):
-             pass
 
     with gr.Row():
-        # LEFT COLUMN: Sidebar (25%)
         with gr.Column(scale=2, min_width=250):
             gr.Markdown("### 📌 Enterprise Hub", elem_classes="section-header")
-            
             with gr.Accordion("Capabilities & Knowledge", open=True):
                 gr.Markdown("""
-                **Capabilities:**
                 *   ✅ Finance & Strategy RAG
                 *   ✅ IT Ticketing Automation
                 *   ✅ Meeting Scheduler
                 *   ✅ HR Policy Assistant
                 *   ✅ Access Management
-                
-                **Knowledge Base:**
-                *   📄 Annual Report 2024–25
-                *   🛡 Corporate Data Policies
-                *   📚 Employee Handbook
                 """)
             
             gr.Markdown("### 🎯 Quick Actions", elem_classes="section-header")
             gr.Markdown("""
-            💬 **Chat Examples:**
             - "Book a ticket for laptop repair"
             - "Schedule a meeting with HR"
             - "What's our revenue growth?"
-            - "Check SAP access status"
             """)
 
-        # MIDDLE COLUMN: Chat Interface (45%)
         with gr.Column(scale=4):
-            gr.Markdown("### 💬 Conversational Assistant")
-            chatbot = gr.Chatbot(
-                height=500,
-                show_label=False,
-                avatar_images=(None, "https://cdn-icons-png.flaticon.com/512/4712/4712109.png")
-            )
+            gr.Markdown("### 💬 Assistant")
+            chatbot = gr.Chatbot(height=500, show_label=False)
             
             with gr.Row():
-                user_input = gr.Textbox(
-                    placeholder="Ask me anything or request actions...",
-                    scale=8,
-                    show_label=False,
-                    container=False,
-                    autofocus=True
-                )
+                user_input = gr.Textbox(placeholder="Ask me anything...", scale=8, show_label=False)
                 submit_btn = gr.Button("Send", variant="primary", scale=1)
             
             gr.Examples(
-                examples=[
-                   "What is the revenue growth for FY25?",
-                   "Raise an IT ticket for a broken monitor",
-                   "Schedule a meeting with the finance team",
-                   "Summarize the HR leave policy"
-                ],
+                examples=["What is the revenue growth for FY25?", "Raise an IT ticket", "Schedule a meeting"],
                 inputs=user_input
             )
 
-        # RIGHT COLUMN: Management Section (30%)
         with gr.Column(scale=3, min_width=300):
-            gr.Markdown("### 📊 Management Dashboard", elem_classes="section-header")
-            
+            gr.Markdown("### 📊 Dashboard", elem_classes="section-header")
             with gr.Tabs():
-                # PENDING ACTIONS TAB
-                with gr.Tab("🎯 Pending Actions"):
+                with gr.Tab("🎯 Pending"):
                     pending_output = gr.HTML(format_pending_actions_display(pending_actions))
-                    
                     with gr.Row():
-                        pending_index = gr.Number(label="Action #", precision=0, minimum=1, scale=1)
-                        confirm_pending_btn = gr.Button("✅ Confirm", variant="primary", scale=1)
-                    
+                        pending_index = gr.Number(label="Action #", precision=0, minimum=1)
+                        confirm_pending_btn = gr.Button("✅ Confirm", variant="primary")
                     action_result_msg = gr.Textbox(label="Result", interactive=False, show_label=False)
                     clear_pending_btn = gr.Button("🗑️ Clear All", size="sm")
 
-                # TICKETS TAB
-                with gr.Tab("📂 View Tickets"):
+                with gr.Tab("📂 Tickets"):
                     tickets_output = gr.HTML(format_tickets_display(tickets_storage))
-                    
-                    with gr.Accordion("🎫 Quick Book Ticket", open=False):
-                        ticket_issue = gr.Textbox(label="Issue Description", placeholder="e.g., Laptop screen not working")
-                        ticket_dept = gr.Dropdown(
-                            choices=["IT", "HR", "Finance", "Admin", "Facilities"],
-                            value="IT",
-                            label="Department"
-                        )
-                        ticket_priority = gr.Radio(
-                            choices=["High", "Medium", "Low"],
-                            value="Medium",
-                            label="Priority"
-                        )
-                        book_ticket_btn = gr.Button("📝 Book Ticket", variant="primary")
-                    
-                    ticket_status = gr.Textbox(label="Status", interactive=False, show_label=False)
-                    
+                    with gr.Accordion("🎫 Quick Book", open=False):
+                        ticket_issue = gr.Textbox(label="Issue")
+                        ticket_dept = gr.Dropdown(choices=["IT", "HR", "Finance", "Facilities"], value="IT", label="Dept")
+                        ticket_priority = gr.Radio(choices=["High", "Medium", "Low"], value="Medium", label="Priority")
+                        book_ticket_btn = gr.Button("📝 Book")
+                    ticket_status = gr.Textbox(interactive=False, show_label=False)
                     with gr.Row():
-                        refresh_tickets_btn = gr.Button("🔄 Refresh", size="sm")
                         delete_ticket_index = gr.Number(label="Ticket #", precision=0, minimum=1)
                         delete_ticket_btn = gr.Button("🗑️ Delete", variant="stop", size="sm")
                 
-                # MEETINGS TAB
-                with gr.Tab("📅 View Meetings"):
+                with gr.Tab("📅 Meetings"):
                     meetings_output = gr.HTML(format_meetings_display(meetings_storage))
-                    
-                    with gr.Accordion("📆 Quick Schedule Meeting", open=False):
-                        meeting_topic = gr.Textbox(label="Meeting Topic", placeholder="e.g., Q1 Strategy Review")
-                        meeting_participants = gr.Textbox(label="Participants", placeholder="e.g., John, Sarah, Mike")
-                        meeting_datetime = gr.Textbox(label="Date & Time", placeholder="e.g., 2026-01-15 2:00 PM")
-                        meeting_location = gr.Textbox(label="Location", placeholder="e.g., Conference Room A or Zoom", value="Virtual")
-                        schedule_meeting_btn = gr.Button("📅 Schedule Meeting", variant="primary")
-                    
-                    meeting_status = gr.Textbox(label="Status", interactive=False, show_label=False)
-                    
+                    with gr.Accordion("📆 Quick Schedule", open=False):
+                        meeting_topic = gr.Textbox(label="Topic")
+                        meeting_participants = gr.Textbox(label="Participants")
+                        meeting_datetime = gr.Textbox(label="Date & Time")
+                        meeting_location = gr.Textbox(label="Location", value="Virtual")
+                        schedule_meeting_btn = gr.Button("📅 Schedule")
+                    meeting_status = gr.Textbox(interactive=False, show_label=False)
                     with gr.Row():
-                        refresh_meetings_btn = gr.Button("🔄 Refresh", size="sm")
                         delete_meeting_index = gr.Number(label="Meeting #", precision=0, minimum=1)
                         delete_meeting_btn = gr.Button("🗑️ Delete", variant="stop", size="sm")
 
-    # Event Handlers
-    def respond(message, history):
-        """Handle chat interactions with streaming effect"""
-        # Add user message to history immediately
-        history.append({"role": "user", "content": message})
-        # Add empty assistant message to be filled
-        history.append({"role": "assistant", "content": ""})
-        
-        # Initial display
-        yield "", history, format_pending_actions_display(pending_actions)
-
-        # Get bot response (simulated streaming or word-by-word)
-        bot_msg_full = process_interaction(message, history[:-2]) # Pass history without the new pair
-        
-        # Stream the message word by word for a smooth effect
-        words = bot_msg_full.split()
-        streaming_msg = ""
-        for i, word in enumerate(words):
-            streaming_msg += word + " "
-            history[-1]["content"] = streaming_msg
-            # Update more frequently at start, then slightly slower
-            if i < 5 or i % 3 == 0 or i == len(words) - 1:
-                yield "", history, format_pending_actions_display(pending_actions)
-        
-        # After full message is received, check for actions to update dashboard
-        try:
-            import re
-            json_match = re.search(r'```json\s*\n(.*?)\n```', bot_msg_full, re.DOTALL)
-            if json_match:
-                action_json_str = json_match.group(1)
-                action_data = json.loads(action_json_str)
-                pending_actions.insert(0, action_data)
-                yield "", history, format_pending_actions_display(pending_actions)
-        except:
-            pass
-
-
-    # Chat event handlers
-    msg_inputs = [user_input, chatbot]
-    msg_outputs = [user_input, chatbot, pending_output]
-    
-    user_input.submit(respond, msg_inputs, msg_outputs)
-    submit_btn.click(respond, msg_inputs, msg_outputs)
-    
-    # Action Confirmation Handlers
-    confirm_pending_btn.click(
-        confirm_action,
-        [pending_index],
-        [action_result_msg, pending_output, meetings_output, tickets_output]
-    )
-    clear_pending_btn.click(
-        clear_all_pending,
-        None,
-        [action_result_msg, pending_output]
-    )
-    
-    # Ticket management handlers
-    book_ticket_btn.click(
-        book_ticket_quick,
-        [ticket_issue, ticket_dept, ticket_priority],
-        [ticket_status, tickets_output]
-    )
-    refresh_tickets_btn.click(refresh_tickets, None, tickets_output)
+    user_input.submit(respond, [user_input, chatbot], [user_input, chatbot, pending_output])
+    submit_btn.click(respond, [user_input, chatbot], [user_input, chatbot, pending_output])
+    confirm_pending_btn.click(confirm_action, [pending_index], [action_result_msg, pending_output, meetings_output, tickets_output])
+    clear_pending_btn.click(clear_all_pending, None, [action_result_msg, pending_output])
+    book_ticket_btn.click(book_ticket_quick, [ticket_issue, ticket_dept, ticket_priority], [ticket_status, tickets_output])
     delete_ticket_btn.click(delete_ticket, delete_ticket_index, [ticket_status, tickets_output])
-    
-    # Meeting management handlers
-    schedule_meeting_btn.click(
-        schedule_meeting_quick,
-        [meeting_topic, meeting_participants, meeting_datetime, meeting_location],
-        [meeting_status, meetings_output]
-    )
-    refresh_meetings_btn.click(refresh_meetings, None, meetings_output)
+    schedule_meeting_btn.click(schedule_meeting_quick, [meeting_topic, meeting_participants, meeting_datetime, meeting_location], [meeting_status, meetings_output])
     delete_meeting_btn.click(delete_meeting, delete_meeting_index, [meeting_status, meetings_output])
 
 if __name__ == "__main__":
-    demo.launch(
-        server_name="127.0.0.1", 
-        server_port=7861, 
-        allowed_paths=["C:\\"],
-        theme=theme,
-        css=CUSTOM_CSS
-    )
+    demo.launch(server_name="127.0.0.1", server_port=7861, allowed_paths=["C:\\"])
