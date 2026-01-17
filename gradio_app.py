@@ -87,7 +87,7 @@ footer {{visibility: hidden}}
 .main-container {{
     background: {INK_BLACK} !important;
     padding: 10px 15px !important;
-    gap: 8px !important;
+    gap: 2px !important;
 }}
 .section-header {{
     font-size: 0.85rem !important;
@@ -322,7 +322,7 @@ with gr.Blocks(title="HCLTech AI Assistant") as demo:
 
     with gr.Row(elem_classes="main-container"):
         # Left Sidebar: Intelligence Hub
-        with gr.Column(scale=1):
+        with gr.Column(scale=1, min_width=200):
             gr.HTML("<div class='section-header section-header-text'>🛠 INTELLIGENCE HUB</div>")
             with gr.Accordion("Knowledge Base", open=True):
                 gr.HTML(f"""
@@ -337,7 +337,7 @@ with gr.Blocks(title="HCLTech AI Assistant") as demo:
             gr.Markdown("- \"Book a laptop repair ticket\"\n- \"Schedule sync with HR team\"\n- \"Analyze FY25 revenue growth\"", elem_classes="kb-item")
 
         # Center: Conversation
-        with gr.Column(scale=3):
+        with gr.Column(scale=4, min_width=600):
             gr.HTML("<div class='section-header section-header-text'>💬 Conversation</div>")
             chatbot = gr.Chatbot(height=520, show_label=False, elem_classes="chat-window chatbot-wrap", value=[{"role": "assistant", "content": "👋 Hello! I am your HCLTech Agentic Assistant. How can I help you today?"}])
             with gr.Row():
@@ -351,7 +351,7 @@ with gr.Blocks(title="HCLTech AI Assistant") as demo:
                 ex3 = gr.Button("Schedule a meeting for project kickoff", elem_classes="example-btn")
 
         # Right Panel: Operational Dashboard
-        with gr.Column(scale=2):
+        with gr.Column(scale=2, min_width=300):
             gr.HTML("<div class='section-header section-header-text'>📋 OPERATIONAL DASHBOARD</div>")
             with gr.Group(elem_classes="dashboard-card"):
                 with gr.Tabs():
