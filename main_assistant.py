@@ -83,7 +83,7 @@ def synthesize_answer(query, chunks):
     prompt = (
         f"Context: {context}\n\n"
         f"Question: {query}\n\n"
-        f"Instruction: Provide a well-structured answer using bullet points only. Focus on figures, metrics, and specific details from the context. Do not include introductory or concluding remarks.\n\n"
+        f"Instruction: Extract the most important financial data and metrics. Output them as a list of bullet points starting with '*'. Be extremely concise. Do not repeat the question.\n\n"
         f"Answer:"
     )
     

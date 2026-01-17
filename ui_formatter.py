@@ -17,6 +17,18 @@ def format_ui_response(response_type, content):
         
         # Remove redunant Question prefix
         main_text = re.sub(r'Question \d+:.*?\n', '', main_text, flags=re.DOTALL | re.IGNORECASE).strip()
+
+        # Convert bullet points to HTML list if they exist
+        if "*" in main_text:
+            lines = main_text.split("\n")
+            list_items = []
+            for line in lines:
+                line = line.strip()
+                if line.startswith("*"):
+                    list_items.append(f"<li>{line[1:].strip()}</li>")
+                elif line:
+                    list_items.append(f"<p>{line}</p>")
+            main_text = f"<ul>{''.join(list_items)}</ul>" if list_items else main_text
         
         formatted = f"""
         <div class="answer-header">📋 FINANCIAL INSIGHT</div>
