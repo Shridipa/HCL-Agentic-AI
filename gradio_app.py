@@ -34,19 +34,23 @@ footer {{visibility: hidden}}
     margin: 12px;
     border: 1px solid rgba(115, 83, 186, 0.4);
     color: {WHITE};
+    color: {WHITE};
+    display: block;
+}}
+.header-row {{
     display: flex;
     align-items: center;
+    gap: 15px;
 }}
 .header-logo-box {{
     background: white;
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 18px;
-    font-size: 2rem;
+    font-size: 1.8rem;
     box-shadow: 0 0 15px rgba(115, 83, 186, 0.3);
 }}
 .header-title-container {{
@@ -64,6 +68,7 @@ footer {{visibility: hidden}}
     align-items: center;
     gap: 12px;
     margin-top: 4px;
+    margin-left: 5px;
 }}
 .badge-ai {{
     background: {DEEP_LILAC};
@@ -82,6 +87,7 @@ footer {{visibility: hidden}}
 .main-container {{
     background: {INK_BLACK} !important;
     padding: 10px 15px !important;
+    gap: 8px !important;
 }}
 .section-header {{
     font-size: 0.85rem !important;
@@ -185,7 +191,7 @@ footer {{visibility: hidden}}
 .tab-nav button {{
     color: {WHITE} !important;
     font-weight: 700 !important;
-    opacity: 0.7;
+    opacity: 1 !important;
 }}
 .tab-nav button.selected {{
     color: {WHITE} !important;
@@ -302,9 +308,11 @@ with gr.Blocks(title="HCLTech AI Assistant") as demo:
     # Header Section
     with gr.Row(elem_classes="header-area"):
         gr.HTML(f"""
-            <div class="header-logo-box">🧠</div>
             <div class="header-title-container">
-                <h1 class="header-title">HCLTech Agentic Assistant</h1>
+                <div class="header-row">
+                    <div class="header-logo-box">🧠</div>
+                    <h1 class="header-title">HCLTech Agentic Assistant</h1>
+                </div>
                 <div class="header-subtitle">
                     <span class="badge-ai">AI POWERED</span>
                     <span class="version-text">v3.0.4 • Stable Release</span>
