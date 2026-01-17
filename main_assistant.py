@@ -83,7 +83,7 @@ def synthesize_answer(query, chunks):
     prompt = (
         f"Context: {context}\n\n"
         f"Question: {query}\n\n"
-        f"Instruction: Provide a highly detailed answer using the context. Include all figures and specific names.\n\n"
+        f"Instruction: Provide a well-structured answer using bullet points only. Focus on figures, metrics, and specific details from the context. Do not include introductory or concluding remarks.\n\n"
         f"Answer:"
     )
     

@@ -341,9 +341,10 @@ Retrieved Chunks (Top-k):
 
 Instruction:
 - Answer ONLY using the retrieved chunks.
+- Provide the answer in a well-structured format using bullet points only.
 - Include citations like [Annual Report 2024–25, Page {{page_number}}] after each claim.
 - If the answer cannot be grounded, say: "I could not find this information in the dataset."
-- Keep the answer concise and precise; preserve numeric values.
+- Keep the answer concise and precise; preserve numeric values and metrics.
 """
 
     return prompt
