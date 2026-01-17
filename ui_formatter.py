@@ -15,10 +15,16 @@ def format_ui_response(response_type, content):
                 main_text = s_parts[0].strip()
                 sources = f"Annual Report 2024–25 Sources: {s_parts[1].replace(']', '').strip()}"
         
-        # Remove redunant Question prefix
-        main_text = re.sub(r'Question \d+:.*?\n', '', main_text, flags=re.DOTALL | re.IGNORECASE).strip()
+        # Remove redundant Question prefix and repeated query text
+        main_text = re.sub(r'(?i)Question \d+:.*?\?', '', main_text, flags=re.DOTALL).strip()
+        
+        # If the model didn't provide bullets, try to force them from sentences
+        if "*" not in main_text and len(main_text) > 30:
+            # Simple sentence splitting
+            sentences = re.split(r'\. |\n', main_text)
+            main_text = "\n".join([f"* {s.strip()}" for s in sentences if len(s.strip()) > 10])
 
-        # Convert bullet points to HTML list if they exist
+        # Convert bullet points to HTML list
         if "*" in main_text:
             lines = main_text.split("\n")
             list_items = []

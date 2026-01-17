@@ -83,7 +83,10 @@ def synthesize_answer(query, chunks):
     prompt = (
         f"Context: {context}\n\n"
         f"Question: {query}\n\n"
-        f"Instruction: Extract the most important financial data and metrics. Output them as a list of bullet points starting with '*'. Be extremely concise. Do not repeat the question.\n\n"
+        f"Instruction: Extract the most important financial data and metrics. Output them as a list of bullet points starting with '*'.\n"
+        f"Example format:\n"
+        f"* Metric 1: Value 1\n"
+        f"* Metric 2: Value 2\n\n"
         f"Answer:"
     )
     
