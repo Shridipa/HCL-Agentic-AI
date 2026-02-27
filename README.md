@@ -61,9 +61,12 @@ Data Assets
 2. Launch the Assistant
    python gradio_app.py
 
-3. 📄 Beautiful HTML Documentation
-   The project includes a custom-built, modern documentation page served directly via FastAPI. It covers features, tech stack, and architecture in detail.
-   - **Access URL:** `http://localhost:8000/documentation` (or simply the root `/`)
+3. 📄 Interactive Python API & Documentation
+   The project features a professional FastAPI backend with multiple documentation layers:
+   - **Main Documentation:** [http://localhost:8000/](http://localhost:8000/) (Project overview, architecture, tech stack)
+   - **Interactive Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs) (API testing playground)
+   - **Clean ReDoc Reference:** [http://localhost:8000/redoc](http://localhost:8000/redoc) (Detailed API spec)
+   - **OpenAPI Schema:** [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
 
 4. Example Usage
 
