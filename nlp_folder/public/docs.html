@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCLTech Agentic AI | Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --grid: rgba(30, 41, 59, 0.3);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            
+            /* Pill Colors */
+            --pill-blue: #0ea5e9;
+            --pill-cyan: #22d3ee;
+            --pill-green: #10b981;
+            --pill-amber: #f59e0b;
+            --pill-purple: #a855f7;
+            --pill-rose: #f43f5e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 2rem;
+        }
+
+        .header-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-meta::before {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--text-dim);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            max-width: 750px;
+            margin-bottom: 3.5rem;
+            line-height: 1.7;
+        }
+
+        /* Tech Stack Pills */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 4rem;
+        }
+
+        .pill {
+            padding: 0.4rem 1.2rem;
+            border-radius: 9999px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid transparent;
+            backdrop-filter: blur(4px);
+        }
+
+        .pill.blue { border-color: var(--pill-blue); color: var(--pill-blue); }
+        .pill.cyan { border-color: var(--pill-cyan); color: var(--pill-cyan); }
+        .pill.green { border-color: var(--pill-green); color: var(--pill-green); }
+        .pill.amber { border-color: var(--pill-amber); color: var(--pill-amber); }
+        .pill.purple { border-color: var(--pill-purple); color: var(--pill-purple); }
+        .pill.rose { border-color: var(--pill-rose); color: var(--pill-rose); }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, var(--grid) 0%, transparent 100%);
+            margin-bottom: 6rem;
+        }
+
+        /* Pipeline Section */
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .pipeline-container {
+            background: rgba(30, 41, 59, 0.2);
+            border: 1px solid var(--grid);
+            border-radius: 12px;
+            padding: 3rem;
+            position: relative;
+        }
+
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+        }
+
+        .pipe-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--grid);
+            transition: 0.3s;
+        }
+
+        .pipe-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .pipe-item .step-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .pipe-item .step-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        /* Specialized Step Colors */
+        .step-intent { border-bottom: 3px solid var(--pill-blue); }
+        .step-ner { border-bottom: 3px solid var(--pill-cyan); }
+        .step-rag { border-bottom: 3px solid var(--pill-green); }
+        .step-agent { border-bottom: 3px solid var(--pill-amber); }
+        .step-output { border-bottom: 3px solid var(--pill-purple); }
+
+        @media (max-width: 768px) {
+            .pipeline-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="header-meta">HCLTech Project — Learning Reference</div>
+
+        <h1>Agentic AI<br>Fundamentals</h1>
+
+        <p class="description">
+            A deep-dive guide covering the five core NLP modules powering 
+            HCLTech's Enterprise Assistant — from zero-shot intent detection 
+            to high-confidence retrieval-augmented generation pipelines.
+        </p>
+
+        <div class="tech-stack">
+            <div class="pill blue">FastAPI</div>
+            <div class="pill cyan">Transformers</div>
+            <div class="pill green">FAISS</div>
+            <div class="pill amber">PyTorch</div>
+            <div class="pill purple">FLAN-T5</div>
+            <div class="pill rose">NLTK</div>
+        </div>
+
+        <hr>
+
+        <span class="section-label">// THE 5-STEP PIPELINE — HOW EACH TOPIC CONNECTS</span>
+
+        <div class="pipeline-container">
+            <div class="pipeline-grid">
+                <div class="pipe-item step-intent">
+                    <span class="step-num">Step 01</span>
+                    <span class="step-name">Intent</span>
+                </div>
+                <div class="pipe-item step-ner">
+                    <span class="step-num">Step 02</span>
+                    <span class="step-name">NER</span>
+                </div>
+                <div class="pipe-item step-rag">
+                    <span class="step-num">Step 03</span>
+                    <span class="step-name">Retrieval</span>
+                </div>
+                <div class="pipe-item step-agent">
+                    <span class="step-num">Step 04</span>
+                    <span class="step-name">Policy</span>
+                </div>
+                <div class="pipe-item step-output">
+                    <span class="step-num">Step 05</span>
+                    <span class="step-name">Synthesis</span>
+                </div>
+            </div>
+            
+            <p style="margin-top: 3rem; color: var(--text-dim); font-size: 0.95rem; max-width: 800px;">
+                The Agentic Pipeline represents a linear flow of data processing. Each stage is strictly isolated, 
+                ensuring that <b>intent confidence</b> drives the retrieval depth, while the <b>Policy Enforcer</b> 
+                validates every fact against the core knowledge base before synthesis.
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>
