@@ -15,41 +15,27 @@ def format_ui_response(response_type, content):
                 main_text = s_parts[0].strip()
                 sources = f"Annual Report 2024–25 Sources: {s_parts[1].replace(']', '').strip()}"
         
-        # Remove redundant Question prefix and repeated query text
+        # Remove redundant Question prefix
         main_text = re.sub(r'(?i)Question \d+:.*?\?', '', main_text, flags=re.DOTALL).strip()
-        
-        # Clean up common AI artifacts for the new structure
         main_text = main_text.replace("Answer:", "").strip()
         
-        # Ensure we don't force bullets if we already have a structured sectioned response
-        if "1. 📊" not in main_text and "*" not in main_text and len(main_text) > 50:
-            sentences = re.split(r'\. |\n', main_text)
-            main_text = "\n".join([f"* {s.strip()}" for s in sentences if len(s.strip()) > 10])
+        # If it's a list from synthesized output, ensure it's properly formatted for Markdown
+        if "*" not in main_text and len(main_text) > 100:
+            sentences = [s.strip() for s in main_text.split(". ") if len(s.strip()) > 10]
+            if len(sentences) > 1:
+                main_text = "\n".join([f"* {s}" for s in sentences])
 
-        formatted = f"""
-        <div class="answer-header">📋 FINANCIAL INSIGHT</div>
-        <div class="answer-body">{main_text}</div>
-        """
+        # Return a structured Markdown response
+        formatted = f"### 📊 INSIGHT\n\n{main_text}"
         
         if sources:
-            formatted += f'<div class="source-footer">{sources}</div>'
+            formatted += f"\n\n---\n**Sources:** {sources}"
             
         if len(parts) > 1:
             details = parts[1].strip()
-            # Clean up details if it has sources at the bottom
             details = re.split(r'\[Annual Report 2024–25 Sources:.*\]', details)[0].strip()
+            formatted += f"\n\n<details>\n<summary>🔍 Data References</summary>\n\n{details}\n</details>"
             
-            referenced_pages = re.findall(r'\[REF PAGE (\d+)\]', details)
-            page_summary = f"Citing {len(referenced_pages)} relevant pages" if referenced_pages else "Full Context"
-            
-            formatted += f"""
-            <div class="reference-container">
-                <details>
-                    <summary>🔍 {page_summary}</summary>
-                    <div class="details-content">{details}</div>
-                </details>
-            </div>
-            """
         return formatted
     elif response_type == "action":
         try:
@@ -60,36 +46,17 @@ def format_ui_response(response_type, content):
             action = json_data.get("action", "unknown")
             formatted_json = json.dumps(json_data, indent=2)
             
+            summary = f"### ✅ {action.replace('_', ' ').title()} Initialized\n"
             if action == "schedule_meeting":
-                html = f"""
-                <div class="meeting-card">
-                    <div class="card-header">
-                        <span class="card-badge">MEETING SCHEDULED</span>
-                        <span style="font-size: 0.7rem; font-weight: 800; color: #2f195f;">{json_data.get('date', 'TBD')}</span>
-                    </div>
-                    <div class="card-title">{json_data.get('topic', 'General Meeting')}</div>
-                    <div class="card-detail">👥 {json_data.get('participants', 'TBD')}</div>
-                </div>
-                """
+                summary += f"* **Topic:** {json_data.get('topic')}\n* **Date:** {json_data.get('date')}\n* **With:** {json_data.get('participants')}"
             elif action == "create_ticket":
-                html = f"""
-                <div class="ticket-card">
-                    <div class="card-header">
-                        <span class="card-badge">{json_data.get('department', 'IT')} TICKET</span>
-                        <span style="font-size: 0.7rem; font-weight: 800; color: #7353ba;">{json_data.get('priority', 'Medium').upper()}</span>
-                    </div>
-                    <div class="card-title">{json_data.get('issue', 'No description')}</div>
-                    <div class="card-detail">📍 Status: INITIALIZED</div>
-                </div>
-                """
-            else:
-                html = f'<div class="ticket-card"><div class="card-title">✅ {action.replace("_", " ").title()} Processed</div></div>'
+                summary += f"* **Issue:** {json_data.get('issue')}\n* **Priority:** {json_data.get('priority')}\n* **Dept:** {json_data.get('department')}"
             
-            return f"{html}\n\n```json\n{formatted_json}\n```"
+            return f"{summary}\n\n```json\n{formatted_json}\n```"
         except Exception:
             return str(content)
     elif response_type == "clarify":
-        return f"💡 {content}"
+        return f"💡 **Clarification Needed:** {content}"
     else:
         return content
 

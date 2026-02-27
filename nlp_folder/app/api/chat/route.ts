@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,18 +7,18 @@ export async function POST(request: NextRequest) {
 
     // Call your ML model
     const mlResponse = await fetch(process.env.ML_MODEL_ENDPOINT!, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...(process.env.ML_MODEL_API_KEY && {
-          'Authorization': `Bearer ${process.env.ML_MODEL_API_KEY}`
-        })
+          Authorization: `Bearer ${process.env.ML_MODEL_API_KEY}`,
+        }),
       },
       body: JSON.stringify({
         query: message,
         user: user,
-        history: conversationHistory || []
-      })
+        history: conversationHistory || [],
+      }),
     });
 
     if (!mlResponse.ok) {
@@ -28,16 +28,15 @@ export async function POST(request: NextRequest) {
     const mlData = await mlResponse.json();
 
     return NextResponse.json({
-      reply: mlData.response || mlData.answer,
+      reply: mlData.reply || mlData.response || mlData.answer,
       metadata: mlData.metadata || {},
-      confidence: mlData.confidence
+      confidence: mlData.confidence,
     });
-
   } catch (error) {
-    console.error('Chat API Error:', error);
+    console.error("Chat API Error:", error);
     return NextResponse.json(
-      { error: 'Failed to process message' },
-      { status: 500 }
+      { error: "Failed to process message" },
+      { status: 500 },
     );
   }
 }

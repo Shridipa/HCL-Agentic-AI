@@ -100,14 +100,19 @@ def analyze_sentiment_and_urgency(query):
 
     
 
+    # Determine urgency level
+    if final_urgent and len(urgency_signals) >= 2:
+        urgency_level = "high"
+    elif final_urgent:
+        urgency_level = "medium"
+    else:
+        urgency_level = "low"
+    
     return {
-
         "sentiment": final_sentiment,
-
         "is_urgent": final_urgent,
-
+        "urgency": urgency_level,  # Added for compatibility with main_assistant.py
         "signals": urgency_signals
-
     }
 
 if __name__ == "__main__":

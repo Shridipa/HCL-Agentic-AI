@@ -22,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   id: string;
@@ -420,9 +422,11 @@ export default function Dashboard() {
             <div key={msg.id} className={`mb-6 ${msg.isUser ? 'flex justify-end' : 'flex justify-start'}`}>
               <div className="max-w-2xl">
                 <Card className={msg.isUser ? "bg-[#1a2942] border-cyan-500/30" : "bg-slate-800/50 border-slate-700/50"}>
-                  <CardContent className="p-4">
-                    <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                    <p className="text-xs text-slate-400 mt-2">
+                  <CardContent className="p-4 prose prose-invert max-w-none prose-sm text-white [&_*]:text-white">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {msg.text}
+                    </ReactMarkdown>
+                    <p className="text-[10px] text-slate-400 mt-2 text-right">
                       {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </CardContent>
