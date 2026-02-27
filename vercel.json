@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd nlp_folder && npm install && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "nlp_folder/.next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD nlp_folder/"
+  "framework": "nextjs"
 }

@@ -1,0 +1,14 @@
+{
+  "name": "hcl-agentic-ai-root",
+  "private": true,
+  "workspaces": [
+    "nlp_folder"
+  ],
+  "scripts": {
+    "build": "cd nlp_folder && npm install && npm run build",
+    "install": "cd nlp_folder && npm install"
+  },
+  "dependencies": {
+    "next": "16.1.6"
+  }
+}
