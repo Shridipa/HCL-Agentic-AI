@@ -123,5 +123,10 @@ async def schedule_meeting(request: ScheduleRequest):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port_env = os.environ.get("PORT", "8000")
+    try:
+        port = int(port_env)
+    except ValueError:
+        print(f"WARNING: Invalid PORT environment variable: '{port_env}'. Falling back to 8000.")
+        port = 8000
     uvicorn.run(app, host="0.0.0.0", port=port)
