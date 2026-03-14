@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   backend:
-    build: .
+    build: ./backend
     container_name: hcl-agentic-ai-backend
     ports:
       - "8000:8000"
     env_file:
       - .env
     volumes:
-      - .:/app
+      - ./backend:/app
     restart: always

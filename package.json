@@ -2,11 +2,11 @@
   "name": "hcl-agentic-ai-root",
   "private": true,
   "workspaces": [
-    "nlp_folder"
+    "frontend"
   ],
   "scripts": {
-    "build": "cd nlp_folder && npm install && npm run build",
-    "install": "cd nlp_folder && npm install"
+    "build": "cd frontend && npm install && npm run build",
+    "install": "cd frontend && npm install"
   },
   "dependencies": {
     "next": "16.1.6"

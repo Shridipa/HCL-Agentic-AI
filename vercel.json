@@ -1,5 +1,5 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "nlp_folder/.next",
+  "outputDirectory": "frontend/.next",
   "framework": "nextjs"
 }
