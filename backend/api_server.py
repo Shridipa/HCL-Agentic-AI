@@ -74,6 +74,7 @@ async def get_documentation():
     return HTMLResponse(content=DOCS_HTML)
 
 @app.get("/health")
+@app.get("/healthz")
 async def health():
     return {"status": "healthy"}
 

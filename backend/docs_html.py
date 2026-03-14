@@ -457,9 +457,9 @@ DOCS_HTML = """
 
                 <h4 style="color: #fff; font-size: 1.25rem; margin: 3rem 0 1.5rem 0;">[3] Access Endpoints</h4>
                 <ul class="arch-list" style="margin-top: 1rem;">
-                    <li><b>Main Dashboard:</b> http://localhost:3000</li>
-                    <li><b>Technical Docs:</b> http://localhost:8000/documentation</li>
-                    <li><b>API Swagger UI:</b> http://localhost:8000/docs</li>
+                    <li><b>Main Dashboard:</b> Your Vercel Deployment URL</li>
+                    <li><b>Technical Docs:</b> Your Render URL + /documentation</li>
+                    <li><b>API Swagger UI:</b> Your Render URL + /docs</li>
                 </ul>
             </div>
         </div>
