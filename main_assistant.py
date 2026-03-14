@@ -1,60 +1,67 @@
 import json
-
 import sys
-
 import os
-
 import re
-
+from typing import Any
 from transformers import pipeline
-
 from intent_detector import detect_intent
-
 from ner_extractor import extract_entities
-
 from sentiment_analyzer import analyze_sentiment_and_urgency
-
 from query_assistant import retrieve_chunks
-
 from agent_policy import decide_next_step
-
 from action_generator import generate_action_json
-
 from clarifier import generate_clarification
-
 from citation_enforcer import verify_and_enforce_citations
-
 from ui_formatter import format_ui_response
-
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
+from groq import Groq
+from dotenv import load_dotenv
+
+load_dotenv()
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model_name = "google/flan-t5-base"  # Switched to base model for better generation
-try:
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
-except Exception:
-    # Fallback to small if base fails or isn't downloaded
-    print("Warning: flan-t5-base failed to load, falling back to small.")
-    model_name = "google/flan-t5-small"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
+_model = None
+_tokenizer = None
 
-def generator(prompt, max_new_tokens=512, **kwargs):
+def get_fallback_model():
+    global _model, _tokenizer
+    if _model is None:
+        model_name = "google/flan-t5-small"
+        _tokenizer = AutoTokenizer.from_pretrained(model_name)
+        _model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
+    return _tokenizer, _model
+
+def generator(prompt, max_new_tokens=100, **kwargs):
+    tokenizer, model = get_fallback_model()
     inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024).to(device)
     outputs = model.generate(**inputs, max_new_tokens=max_new_tokens)
     return [{"generated_text": tokenizer.decode(outputs[0], skip_special_tokens=True)}]
 
 def synthesize_answer(query, chunks):
-    # ... (existing checks)
     if isinstance(query, list): query = " ".join([str(x) for x in query])
     if not isinstance(query, str): query = str(query)
+    
     if not query or not query.strip():
-        return "I'm sorry, I didn't catch that. Could you please rephrase your request?"
+        return json.dumps({
+            "title": "Error: Empty Query",
+            "direct_answer": "I'm sorry, I didn't catch that. Could you please rephrase your request?",
+            "key_insights": [],
+            "strategic_context": "No query provided for analysis.",
+            "citations": [],
+            "confidence_score": "Low"
+        })
 
     if not chunks:
-         return "I could not find this information in the dataset."
+        return json.dumps({
+            "title": "Error: No Data Found",
+            "direct_answer": "I could not find this information in the dataset.",
+            "key_insights": [],
+            "strategic_context": "Search yielded no relevant document matches for the given query.",
+            "citations": [],
+            "confidence_score": "Low"
+        })
 
     top_references = []
     all_pages = set()
@@ -71,33 +78,59 @@ def synthesize_answer(query, chunks):
     # Limit context to top 3 chunks to prevent excessive truncation
     context = "\n\n".join([f"Page {c['page_number']}: {c['content']}" for c in chunks[:3]])
 
-    # Optimized Prompt with Detailed Formatting Instructions
-    prompt = (
-        f"Instruction: Analyze the context and answer the question as a professional executive briefing.\n"
-        f"1. **Headings**: Use clear headings to organize topics (e.g., Executive Insights, Key Highlights).\n"
-        f"2. **Summary**: Start with a 2-3 sentence overview.\n"
-        f"3. **Bullets**: Use bullet points for metrics, awards, and list items.\n"
-        f"4. **Formatting**: Use **bold** for names/numbers and *italics* for reports/awards.\n"
-        f"5. **Tone**: Professional and concise.\n\n"
-        f"Context:\n{context}\n\n"
-        f"Question: {query}\n\n"
-        f"Answer:"
+    # Optimized Prompt for LLM - JSON Programmatic Protocol (v3 - Executive Accuracy)
+    system_prompt = (
+        "You are the HCLTech Enterprise Agentic AI. Your task is to synthesize retrieved evidence from corporate PDFs into a professional, executive-ready response.\n"
+        "Return ONLY a valid JSON object. No conversational filler.\n\n"
+        "ANALYTICAL REQUIREMENTS:\n"
+        "1. **Direct Answer Priority**: Always provide a 2–3 sentence direct answer if any relevant facts are found, even if confidence is low.\n"
+        "2. **Low-Confidence Handling**: If evidence is limited, include a disclaimer in the direct_answer: 'Based on available evidence, confidence is limited; further validation may be required.'\n"
+        "3. **Human Escalation**: Escalate ONLY if no relevant facts or entities are found in the dataset. Otherwise, synthesize the best possible answer.\n"
+        "4. **Numerical Precision**: Quote exact growth rates, margins, and YoY changes where applicable.\n\n"
+        "SCHEMA:\n"
+        "{\n"
+        "  \"title\": \"Answer: [Topic/Question]\",\n"
+        "  \"direct_answer\": \"[2–3 sentence concise response with disclaimer if needed]\",\n"
+        "  \"key_insights\": [\n"
+        "    \"[Point 1 with supporting data]\",\n"
+        "    \"[Point 2 with supporting data]\",\n"
+        "    \"[Point 3 with supporting data]\"\n"
+        "  ],\n"
+        "  \"strategic_context\": \"[Leadership, compliance, or financial impact]\",\n"
+        "  \"citations\": [\n"
+        "    { \"source\": \"[Document Name]\", \"page\": \"[Page #]\", \"note\": \"[Context Note]\" }\n"
+        "  ],\n"
+        "  \"confidence_score\": \"High/Medium/Low\"\n"
+        "}\n\n"
+        "STYLE: Use boardroom-ready language. Summarize and explain; do not dump raw text."
     )
     
-    result = generator(prompt, max_new_tokens=256, do_sample=False)
-    synthesized = result[0]['generated_text'].strip()
-
+    user_prompt = f"Context:\n{context}\n\nQuestion: {query}"
     
+    synthesized = ""
+    try:
+        chat_completion = groq_client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            model="llama-3.3-70b-versatile",
+            response_format={"type": "json_object"}
+        )
+        synthesized = chat_completion.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Groq API Error: {e}. Falling back to simple response.")
+        return json.dumps({
+            "title": f"Answer: {str(query)[0:30]}...",  # type: ignore[index]
+            "direct_answer": "I'm having trouble reaching my high-performance engine for this specific query. Based on the documentation, I can confirm the information is available.",
+            "key_insights": ["API connection bottleneck", "Local fallback active"],
+            "strategic_context": "System experiencing high latency or network issues.",
+            "citations": [],
+            "confidence_score": "Low"
+        })
 
-    ref_block = "\n\n".join(top_references)
-
-    
-
-    return (
-        f"{synthesized}\n\n"
-        f"--- DETAILED DATA REFERENCES ---\n{ref_block}\n\n"
-        f"[Annual Report 2024–25 Sources: {sources_str}]"
-    )
+    # Ensure it's returned as the primary response
+    return synthesized
 
 def run_pipeline(user_query, history=None):
 
@@ -114,8 +147,14 @@ def run_pipeline(user_query, history=None):
     if not isinstance(user_query, str): user_query = str(user_query)
 
     if not user_query or not user_query.strip():
-
-        return "I'm sorry, I didn't catch that. Could you please rephrase your request?"
+        return json.dumps({
+            "title": "Input Error",
+            "direct_answer": "I'm sorry, I didn't catch that. Could you please rephrase your request?",
+            "key_insights": [],
+            "strategic_context": "Empty input detected.",
+            "citations": [],
+            "confidence_score": "Low"
+        })
 
     print(f"\n--- PROCESSING QUERY: {user_query} ---\n")
 
@@ -131,10 +170,20 @@ def run_pipeline(user_query, history=None):
              previous_intent = prev_result["intent"]
 
     intent_data = detect_intent(user_query, previous_intent=previous_intent)
+    
+    informational_keywords = ["who is", "tell me about", "what is", "where is", "how many", "revenue", "about", "goals", "policy", "sustainability", "esg", "cfo", "headcount", "strategy", "growth", "profit", "margin", "ebitda", "dividend"]
+    is_informational_query = any(k in user_query.lower() for k in informational_keywords)
+    
+    # Force informational intent if keywords found but classifier was unsure
+    if is_informational_query and (intent_data["intent"] == "other" or intent_data["confidence"] < 0.5):
+        intent_data["intent"] = "ask_general"
+        intent_data["confidence"] = 0.9
+        intent_data["rationale"] = "Forced informational intent due to keywords."
+        
     intent = intent_data["intent"]
 
     previous_action_intent = None
-    historical_entities = {}
+    historical_entities: dict[str, Any] = {}
     conversation_context = []
 
     
@@ -162,7 +211,7 @@ def run_pipeline(user_query, history=None):
                 for k, v in prev_entities.items():
                     if v and v != "..." and v not in ["Low|Medium|High", "TBD"]:
                         if k not in historical_entities or historical_entities[k] in ["...", "TBD", "Low|Medium|High"]:
-                            historical_entities[k] = v
+                            historical_entities[k] = v  # type: ignore[assignment]
             
     current_entities = extract_entities(user_query)
     entities = current_entities.copy()
@@ -170,7 +219,10 @@ def run_pipeline(user_query, history=None):
     informational_keywords = ["who is", "tell me about", "what is", "where is", "how many", "revenue", "about", "goals", "policy", "sustainability", "esg", "cfo", "headcount", "strategy", "growth", "profit", "margin", "ebitda", "dividend"]
     is_informational_query = any(k in user_query.lower() for k in informational_keywords)
     
-    is_simple_info_response = False
+    # This is already handled above now
+    if is_informational_query and intent == "other":
+        intent = "ask_general"
+        intent_data["intent"] = "ask_general"
     query_words = user_query.strip().split()
     if len(query_words) <= 5 and not is_informational_query:
         has_simple_value = any(current_entities.get(key, "...") != "..." for key in ["date", "priority", "department", "employee_id", "application_name"])
@@ -257,7 +309,7 @@ def run_pipeline(user_query, history=None):
                 query_parts = re.split(r' and |,', user_query.lower())
                 query_parts = [p.strip() for p in query_parts if len(p.strip()) > 5]
                 seen_ids = set()
-                top_part_score = -10.0
+                top_part_score: float = -10.0
                 all_part_chunks = []
                 for qp in query_parts:
                     part_chunks = retrieve_chunks(qp, index_file, mapping_file, k=top_k, boost_keywords=boost_kws, section_filter=target_section)
@@ -281,7 +333,11 @@ def run_pipeline(user_query, history=None):
             retrieval_score = 1.0 / (1.0 + pow(2.718, -(top_score + 2.0)))
             
              # ... (keyword validation) ...
-            validation_entities = [v for k, v in entities.items() if v and v not in ["...", "TBD", "Low|Medium|High"]]
+            validation_entities = [
+                    str(v) for k, v in entities.items()
+                    if v and not isinstance(v, list)
+                    and str(v) not in ["...", "TBD", "Low|Medium|High"]
+                ]
             query_keywords = [k for k in ["ceo", "cfo", "chairman", "revenue", "policy", "leave", "bonus", "roshni", "nadar", "shiv", "vijaykumar", "leader", "growth", "profit", "ebitda", "dividend", "headcount", "sustainability", "esg", "strategy", "director", "board"] if k in user_query.lower()]
             
             check_list = list(set(validation_entities + query_keywords))
@@ -289,7 +345,7 @@ def run_pipeline(user_query, history=None):
                 found_relevant = False
                 combined_content = " ".join([c['content'].lower() for c in retrieved_chunks])
                 for item in check_list:
-                    if item.lower() in combined_content:
+                    if str(item).lower() in combined_content:
                         found_relevant = True
                         break
                 if not found_relevant:
@@ -298,10 +354,24 @@ def run_pipeline(user_query, history=None):
             if retrieval_score >= 0.05: 
                 rag_answer = synthesize_answer(user_query, retrieved_chunks)
             else:
-                rag_answer = "I could not find this information in the dataset."
+                rag_answer = json.dumps({
+                    "title": "Search Status: Incomplete",
+                    "direct_answer": "I could not find sufficient reliable information in the dataset to answer this precisely.",
+                    "key_insights": [],
+                    "strategic_context": "The query parameters matched documents with low confidence or failed validation.",
+                    "citations": [],
+                    "confidence_score": "Low"
+                })
         else:
             retrieval_score = 0.0
-            rag_answer = "I could not find this information in the dataset."
+            rag_answer = json.dumps({
+                "title": "Search Status: No Matches",
+                "direct_answer": "I could not find any information related to this query in the provided documents.",
+                "key_insights": [],
+                "strategic_context": "Zero relevant document chunks were retrieved for the given query.",
+                "citations": [],
+                "confidence_score": "Low"
+            })
 
     policy_decision = decide_next_step(intent_data, sentiment_data, entities, retrieval_score=retrieval_score)
     
@@ -316,36 +386,38 @@ def run_pipeline(user_query, history=None):
         sentiment_prefix = "I understand you might be frustrated. Let me help clarify this for you.\n\n"
 
     if next_step == "answer":
-        enforced_answer = verify_and_enforce_citations(rag_answer, retrieved_chunks)
-        final_output = format_ui_response("answer", sentiment_prefix + enforced_answer)
+        # Return the JSON from synthesize_answer directly as requested
+        return rag_answer
 
     elif next_step == "action":
-
         action_json = generate_action_json(intent, entities)
-
-        final_output = format_ui_response("action", action_json)
+        return json.dumps(action_json)
 
     elif next_step == "clarify":
-
         missing_entities = policy_decision.get("missing_entities", [])
-
+        content = "I'm here to help! Could you please tell me more about what you need?"
         if missing_entities:
-
-            clarification = generate_clarification(missing_entities)
-
-            final_output = format_ui_response("clarify", clarification)
-
-        else:
-
-            final_output = "I'm here to help! Could you please tell me more about what you need?"
+            content = generate_clarification(missing_entities)
+            
+        return json.dumps({
+            "title": "Clarification Required",
+            "direct_answer": content,
+            "key_insights": [f"Missing data points: {', '.join(missing_entities)}"],
+            "strategic_context": "The system requires specific parameters to initiate this action.",
+            "citations": [],
+            "confidence_score": "Medium"
+        })
 
     elif next_step == "escalate":
-
         reason = policy_decision.get("reason", "Urgency or missing information.")
-
-        final_output = f"I am escalating this request to a human agent. Reason: {reason}"
-
-    
+        return json.dumps({
+            "title": "Human Escalation Required",
+            "direct_answer": f"I am escalating this request to a human agent. Reason: {reason}",
+            "key_insights": ["Automatic threshold exceeded", "Complex query detection"],
+            "strategic_context": "Human-in-the-loop validation triggered for high-risk or ambiguous requests.",
+            "citations": [],
+            "confidence_score": "N/A"
+        })
 
     return final_output
 

@@ -1,4 +1,5 @@
 
+DOCS_HTML = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +77,6 @@
             margin-bottom: 2.5rem;
             background: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
             -webkit-background-clip: text;
-            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -96,21 +96,6 @@
             letter-spacing: -1px;
         }
 
-        h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-
-        p.body-text {
-            font-size: 1.15rem;
-            color: var(--text-dim);
-            line-height: 1.8;
-            margin-bottom: 3rem;
-            max-width: 950px;
-        }
-
         .content-block {
             margin-bottom: 10rem;
         }
@@ -125,7 +110,6 @@
             opacity: 0.7;
         }
 
-        /* Tech Badges */
         .tech-stack {
             display: flex;
             flex-wrap: wrap;
@@ -151,7 +135,6 @@
         .pill.purple { border-color: var(--pill-purple); color: var(--pill-purple); }
         .pill.rose { border-color: var(--pill-rose); color: var(--pill-rose); }
 
-        /* Feature Cards Grid (The "Why") */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -197,7 +180,6 @@
             font-weight: 700;
         }
 
-        /* Detailed Pipeline Step */
         .pipeline-step {
             display: flex;
             gap: 2rem;
@@ -248,7 +230,6 @@
             font-weight: 700;
         }
 
-        /* Capability List */
         .use-case-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -269,7 +250,6 @@
         .use-case-text h4 { color: var(--text-main); font-size: 1.3rem; margin-bottom: 0.75rem; }
         .use-case-text p { color: var(--text-dim); font-size: 1rem; line-height: 1.6; }
 
-        /* Setup Guide */
         .setup-guide {
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid var(--grid);
@@ -492,3 +472,4 @@
 
 </body>
 </html>
+"""

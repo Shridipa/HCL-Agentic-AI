@@ -4,9 +4,14 @@ import sys
 
 import re
 
-from transformers import pipeline
+_ner_classifier = None
 
-ner_classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
+def get_ner_classifier():
+    global _ner_classifier
+    if _ner_classifier is None:
+        from transformers import pipeline
+        _ner_classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
+    return _ner_classifier
 
 def extract_entities(query):
     if isinstance(query, list): query = " ".join([str(x) for x in query])
@@ -62,9 +67,76 @@ def extract_entities(query):
 
         "topic": "...",
 
-        "participants": "..."
+        "participants": "...",
+        "time": "...",
+        "location": "Virtual",
+        "participant_emails": []   # extracted email addresses from the query
 
     }
+
+    # ── Email Address Extraction ──────────────────────────────────────────
+    # Extracts participant email addresses typed inline in the query
+    # e.g. "schedule a meeting with alice@hcl.com and bob@company.com"
+    email_pattern = r'[\w\.-]+@[\w\.-]+\.\w+'
+    found_emails = re.findall(email_pattern, query)
+    if found_emails:
+        entities["participant_emails"] = [e.lower().strip() for e in found_emails]
+
+    # ── Location Extraction ───────────────────────────────────────────────
+    location_patterns = [
+        r'(?:at|in|location[:\s]+)\s+([A-Z][a-zA-Z\s]+(?:Room|Hall|Office|Center|Centre|Lab|Conference)?)',
+        r'(?:conference\s+room|meeting\s+room)\s+([\w\s-]+)'
+    ]
+    for pattern in location_patterns:
+        loc_match = re.search(pattern, query, re.IGNORECASE)
+        if loc_match:
+            candidate = loc_match.group(1).strip()
+            # Avoid matching generic words
+            if len(candidate) > 2 and candidate.lower() not in ("the", "a", "an", "this", "that"):
+                entities["location"] = candidate
+                break
+
+    # ── Time Extraction ───────────────────────────────────────────────────
+    time_patterns = [
+        r'\b\d{1,2}:\d{2}\s*(?:AM|PM)\b',
+        r'\bat\s+(\d{1,2}(?::\d{2})?\s*(?:AM|PM)?)\b',
+        r'\baround\s+(\d{1,2}(?::\d{2})?\s*(?:AM|PM)?)\b'
+    ]
+    for pattern in time_patterns:
+        match = re.search(pattern, query, re.IGNORECASE)
+        if match:
+            entities["time"] = match.group(0).upper().replace("AT ", "").replace("AROUND ", "").strip()
+            break
+
+    # ── Participants Name Extraction ──────────────────────────────────────
+    # Extract names (non-email parts) from various patterns
+    query_no_emails = re.sub(email_pattern, '', query)
+    
+    # 1. Names preceded by common invitation keywords
+    invitation_patterns = [
+        r'(?:with|between|invite|add|including)\s+([^,\.]+)',
+        r'(?:meeting\s+with)\s+([^,\.]+)',
+        r'([^,\.]+?)\s+(?:will\s+be\s+there|will\s+be\s+joining|is\s+attending)'
+    ]
+    
+    found_participants = []
+    for pattern in invitation_patterns:
+        matches = re.finditer(pattern, query_no_emails, re.IGNORECASE)
+        for match in matches:
+            p_text = match.group(1).lower().replace(" and ", ", ").replace(" & ", ", ")
+            # Split by comma-like separators
+            names = [p.strip().title() for p in re.split(r'[,;]|\s+and\s+', p_text) if p.strip() and len(p.strip()) > 1]
+            for name in names:
+                # Filter out "name" / "names" prefix
+                clean_name = re.sub(r'^(?:name|names|participant|participants|colleague|colleagues|employee|employees)\s+', '', name, flags=re.IGNORECASE)
+                # Basic person name check (very simple proxy)
+                if clean_name.lower() not in ("me", "i", "everyone", "anyone", "all", "us", "him", "her", "them", "someone"):
+                    found_participants.append(clean_name)
+    
+    if found_participants:
+        # Use a list of unique names while preserving order
+        seen = set()
+        entities["participants"] = [x for x in found_participants if not (x in seen or seen.add(x))]
 
     emp_id_match = re.search(r'\b(EMP|HCL)\d+\b', query, re.IGNORECASE)
 
@@ -125,10 +197,8 @@ def extract_entities(query):
     slots_to_check = list(set(likely_slots)) if likely_slots else list(slots_to_fill.keys())
 
     for slot in slots_to_check:
-
         labels = slots_to_fill[slot]
-
-        result = ner_classifier(query, labels, multi_label=False)
+        result = get_ner_classifier()(query, labels, multi_label=False)
 
         if result['scores'][0] > 0.65:
 
@@ -147,12 +217,14 @@ def extract_entities(query):
         (r'\btomorrow\b', 'relative'),
 
         (r'\btoday\b', 'relative'),
+        
+        # Handles "7th March, 2026", "March 7th, 2026", "7 March", etc.
+        (r'\b\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december)(?:\s*,?\s*\d{4})?\b', 'Natural Date 1'),
+        (r'\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,?\s*\d{4})?\b', 'Natural Date 2'),
 
         (r'\bnext week\b', 'relative'),
 
         (r'\bnext month\b', 'relative'),
-
-        (r'\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}\b', 'Month Day')
 
     ]
 
@@ -171,39 +243,49 @@ def extract_entities(query):
     if any(keyword in query.lower() for keyword in meeting_keywords):
 
         topic_patterns = [
-
-            r'(?:about|for|regarding|to discuss)\s+([^,\.]+)',
-
-                                                           
-
+            r'(?:discussion|meeting|briefing|session|call|sync)\s+(?:about|on|for|regarding|to discuss)\s+([^,\.\?]+)',
+            r'(?:subject|topic|title|purpose)[:\s]+([^,\.\?]+)',
+            r'(?:for)\s+([^,\.\?]+?)\s+(?:on|at|scheduled|booked)'
         ]
-
-        for pattern in topic_patterns:
-
-            match = re.search(pattern, query, re.IGNORECASE)
-
-            if match:
-
-                entities["topic"] = match.group(1).strip()
-
-                break
-
         
+        for pattern in topic_patterns:
+            match = re.search(pattern, query, re.IGNORECASE)
+            if match:
+                candidate = match.group(1).strip()
+                if len(candidate.split()) <= 10: # Avoid capturing entire sentences
+                    entities["topic"] = candidate
+                    break
+        
+        # Fallback for "schedule/scheduled the 'X'"
+        if entities["topic"] == "...":
+            # Match quoted text after 'schedule' or 'scheduled'
+            quoted_match = re.search(r"(?:schedule|scheduled)\s+(?:the\s+)?['\"]([^'\"]+)['\"]", query, re.IGNORECASE)
+            if quoted_match:
+                entities["topic"] = quoted_match.group(1)
+            elif "schedule the " in query.lower() or "scheduled the " in query.lower():
+                # Extract words after "schedule/scheduled the " until a date/time or end of sentence
+                marker = "scheduled the " if "scheduled the " in query.lower() else "schedule the "
+                after_sched = query.lower().split(marker)[1]
+                # stop at "for", "on", "at", "."
+                stop_words = ["for", "on", "at", ".", ",", "with"]
+                topic_words = []
+                for word in after_sched.split():
+                    # Check if the word starts with a stop word or is a stop word
+                    if any(s == word.rstrip('.,') for s in stop_words): break
+                    topic_words.append(word)
+                if topic_words:
+                    entities["topic"] = " ".join(topic_words).title()
 
         if entities["topic"] == "..." and "meeting" in query.lower():
-
-            if len(query.strip().split()) > 3:
-
-                entities["topic"] = query
-
+            words = query.strip().split()
+            if len(words) > 3:
+                entities["topic"] = " ".join(words[:5])
             else:
-
                 entities["topic"] = "Business Discussion"
 
     it_keywords = ['broken', 'issue', 'laptop', 'access', 'failed', 'problem', 'reset', 'password', 'slow', 'flickering', 'ticket', 'hardware', 'monitor', 'screen', 'keyboard', 'mouse', 'functioning', 'working', 'help', 'repair', 'fix']
 
     is_action_like = any(k in query.lower() for k in it_keywords)
-
     
 
     if is_action_like and len(query.strip().split()) >= 3:

@@ -40,65 +40,65 @@ def generate_action_json(intent, entities):
 
         dept = "General Support"
 
-    action_json = {
-
+    raw_action = {
         "action": action_name,
-
         "department": dept,
-
         "priority": priority,
-
     }
-
     
-
     import datetime
-
+    raw_action["timestamp"] = datetime.datetime.now().isoformat()
+    raw_action["requested_by"] = entities.get("employee_id", "Anonymous")
     
-
-    action_json["timestamp"] = datetime.datetime.now().isoformat()
-
-    action_json["requested_by"] = entities.get("employee_id", "Anonymous")
-
-    
-
     if action_name == "schedule_meeting":
-
-        action_json["topic"] = entities.get("topic", "Meeting Request")
-
-        action_json["participants"] = entities.get("participants", "TBD")
-
-        action_json["date"] = entities.get("date", "TBD")
-
-        action_json["location"] = entities.get("location", "Virtual")
-
+        raw_action["topic"] = entities.get("topic", "Meeting Request")
+        raw_action["participants"] = entities.get("participants", "TBD")
+        raw_action["participant_emails"] = entities.get("participant_emails", [])
+        raw_action["date"] = entities.get("date", "TBD")
+        raw_action["time"] = entities.get("time", "TBD")
+        raw_action["location"] = entities.get("location", "Virtual")
     else:
-
         desc = entities.get("description", "...")
-
         if desc == "..." or not desc:
-
             desc = entities.get("ticket_type", "General Issue")
-
-        action_json["issue"] = desc
-
+        raw_action["issue"] = desc
     
-
-    action_json["context"] = {
-
+    raw_action["context"] = {
         "employee_id": entities.get("employee_id", "..."),
-
         "department": entities.get("department", "..."),
-
         "application_name": entities.get("application_name", "..."),
-
         "priority_level": priority
-
     }
 
-    
+    # Wrap in Executive Briefing format for the UI
+    title = f"Action: {action_name.replace('_', ' ').title()}"
+    if action_name == "schedule_meeting":
+        direct_answer = f"I have successfully scheduled the '{raw_action['topic']}' for {raw_action['date']} at {raw_action['time']}."
+        insights = [
+            f"Topic: {raw_action['topic']}",
+            f"Participants: {raw_action['participants']}",
+            f"Location: {raw_action['location']}"
+        ]
+    elif action_name == "create_ticket":
+        direct_answer = f"I have raised a support ticket for your issue: '{raw_action['issue']}'."
+        insights = [
+            f"Priority: {raw_action['priority']}",
+            f"Department: {raw_action['department']}",
+            f"Reference: TKT-{datetime.datetime.now().strftime('%M%S')}"
+        ]
+    else:
+        direct_answer = f"I have initiated the following action: {action_name.replace('_', ' ')}."
+        insights = ["Action processed successfully", f"Department: {dept}"]
 
-    return action_json
+    return {
+        "title": title,
+        "direct_answer": direct_answer,
+        "key_insights": insights,
+        "strategic_context": "Automated enterprise workflow execution triggered by natural language intent.",
+        "citations": [],
+        "confidence_score": "High",
+        "action_data": raw_action
+    }
 
 if __name__ == "__main__":
 

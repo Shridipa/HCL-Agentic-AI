@@ -6,3 +6,13 @@ numpy
 torch
 nltk
 scikit-learn
+groq
+python-dotenv
+fastapi[standard]
+uvicorn
+requests
+pydantic
+# Google Calendar & Email notification
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

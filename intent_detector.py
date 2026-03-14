@@ -4,9 +4,14 @@ import sys
 
 import os
 
-from transformers import pipeline
+_classifier = None
 
-classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
+def get_classifier():
+    global _classifier
+    if _classifier is None:
+        from transformers import pipeline
+        _classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
+    return _classifier
 
 def detect_intent(query, context="", previous_intent=None):
     if isinstance(query, list): query = " ".join([str(x) for x in query])
@@ -36,7 +41,7 @@ def detect_intent(query, context="", previous_intent=None):
     is_follow_up = len(query.split()) < 5 and previous_intent and previous_intent != "other"
     
     candidate_labels = list(intent_map.keys())
-    results = classifier(query, candidate_labels)
+    results = get_classifier()(query, candidate_labels)
     
     best_label = results['labels'][0]
     top_intent = intent_map[best_label]

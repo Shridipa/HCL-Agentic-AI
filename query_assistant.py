@@ -8,11 +8,22 @@ import faiss
 
 import re
 
-from sentence_transformers import SentenceTransformer, CrossEncoder
+_embedding_model = None
+_rerank_model = None
 
-embedding_model = SentenceTransformer('all-mpnet-base-v2')
+def get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        from sentence_transformers import SentenceTransformer
+        _embedding_model = SentenceTransformer('all-mpnet-base-v2')
+    return _embedding_model
 
-rerank_model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+def get_rerank_model():
+    global _rerank_model
+    if _rerank_model is None:
+        from sentence_transformers import CrossEncoder
+        _rerank_model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+    return _rerank_model
 
 _cached_index = None
 
@@ -84,7 +95,8 @@ def expand_query(query):
 
                                                                            
 
-        return query + " " + " ".join(list(set(expanded_terms))[:4])
+        expanded_list = list(set(expanded_terms))
+        return query + " " + " ".join(expanded_list[:4])
 
     return query
 
@@ -166,9 +178,8 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
 
                                                         
 
-    query_vector = embedding_model.encode([expanded_query]).astype('float32')
-
-    distances_sem, indices_sem = index.search(query_vector, 1000) 
+    query_vector = get_embedding_model().encode([expanded_query]).astype('float32')
+    distances_sem, indices_sem = index.search(query_vector, 50) # Reduced pool for speed
 
     
 
@@ -220,7 +231,7 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
 
             
 
-            chunk["rrf_score"] = rrf_base + lex_score
+            chunk["rrf_score"] = float(rrf_base) + float(lex_score)
 
             candidate_map[idx] = chunk
 
@@ -235,8 +246,7 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
                                                                    
 
     pairs = [[query_clean, c['content']] for c in rerank_pool]
-
-    rerank_scores = rerank_model.predict(pairs)
+    rerank_scores = get_rerank_model().predict(pairs)
 
     
 
@@ -256,7 +266,7 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
 
             if name in query_clean.lower() and name in content_lower:
 
-                boost += 12.0                                   
+                boost += 12.0
 
         
 
@@ -268,7 +278,7 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
 
             if num in candidate['content']:
 
-                boost += 10.0                         
+                boost += 10.0
 
         
 
@@ -280,7 +290,7 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
 
             if any(bk in content_lower for bk in boilerplate_kws):
 
-                boost -= 10.0
+                boost = boost - 10.0
 
             
 

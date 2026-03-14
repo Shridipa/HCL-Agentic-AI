@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.log
+test_ner_output.txt
+.git/
+.vscode/
+node_modules/
+*.pyc
+.env
+token.json
+credentials.json

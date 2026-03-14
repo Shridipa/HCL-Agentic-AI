@@ -4,17 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -24,13 +21,15 @@ import {
 } from '@/components/ui/select';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 interface Transaction {
@@ -61,11 +60,14 @@ interface Meeting {
 }
 
 export default function Dashboard() {
+  const router = useRouter();
   const [userName, setUserName] = useState('User');
+  const [userEmail, setUserEmail] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [scheduleStatus, setScheduleStatus] = useState<string | null>(null);
 
   // Dialog states
   const [financeDialog, setFinanceDialog] = useState(false);
@@ -75,677 +77,352 @@ export default function Dashboard() {
 
   // Data states
   const [transactions, setTransactions] = useState<Transaction[]>([
-    {
-      id: '1',
-      type: 'expense',
-      amount: 1500,
-      date: '2026-02-10',
-      status: 'completed',
-      description: 'Office Supplies'
-    },
-    {
-      id: '2',
-      type: 'income',
-      amount: 5000,
-      date: '2026-02-09',
-      status: 'completed',
-      description: 'Client Payment'
-    },
-    {
-      id: '3',
-      type: 'expense',
-      amount: 800,
-      date: '2026-02-08',
-      status: 'pending',
-      description: 'Software License'
-    }
+    { id: '1', type: 'expense', amount: 1500, date: '2026-02-10', status: 'completed', description: 'Office Supplies' },
+    { id: '2', type: 'income', amount: 5000, date: '2026-02-09', status: 'completed', description: 'Client Payment' }
   ]);
 
-  const [tickets, setTickets] = useState<Ticket[]>([
-    {
-      id: '1',
-      title: 'System Login Issue',
-      status: 'in-progress',
-      priority: 'high',
-      createdAt: '2026-02-12',
-      description: 'Users unable to login to the system'
-    },
-    {
-      id: '2',
-      title: 'Email Configuration',
-      status: 'open',
-      priority: 'medium',
-      createdAt: '2026-02-11',
-      description: 'Need to setup email forwarding'
-    },
-    {
-      id: '3',
-      title: 'Access Request',
-      status: 'closed',
-      priority: 'low',
-      createdAt: '2026-02-10',
-      description: 'Database access for new employee'
-    }
-  ]);
-
-  const [meetings, setMeetings] = useState<Meeting[]>([
-    {
-      id: '1',
-      title: 'Project Review',
-      date: '2026-02-14',
-      time: '10:00 AM',
-      participants: ['Alex Chen', 'John Doe'],
-      status: 'scheduled'
-    },
-    {
-      id: '2',
-      title: 'Team Standup',
-      date: '2026-02-13',
-      time: '9:00 AM',
-      participants: ['Alex Chen', 'Sarah Smith', 'Mike Johnson'],
-      status: 'completed'
-    }
-  ]);
-
-  // New ticket form state
-  const [newTicket, setNewTicket] = useState({
-    title: '',
-    priority: 'medium',
-    description: ''
-  });
-
-  // New transaction form state
-  const [newTransaction, setNewTransaction] = useState({
-    type: 'expense',
-    amount: '',
-    description: ''
-  });
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
   useEffect(() => {
-    // Retrieve user from localStorage
+    const savedMeetings = localStorage.getItem('hcl_meetings');
+    if (savedMeetings) setMeetings(JSON.parse(savedMeetings));
+    else {
+      setMeetings([{ id: '1', title: 'Project Review', date: '2026-02-14', time: '10:00 AM', participants: ['Alex Chen', 'John Doe'], status: 'scheduled' }]);
+    }
+    const savedTickets = localStorage.getItem('hcl_tickets');
+    if (savedTickets) setTickets(JSON.parse(savedTickets));
+    else {
+      setTickets([{ id: '1', title: 'System Login Issue', status: 'in-progress', priority: 'high', createdAt: '2026-02-12', description: 'Users unable to login to the system' }]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (meetings.length > 0) localStorage.setItem('hcl_meetings', JSON.stringify(meetings));
+  }, [meetings]);
+
+  useEffect(() => {
+    if (tickets.length > 0) localStorage.setItem('hcl_tickets', JSON.stringify(tickets));
+  }, [tickets]);
+
+  const [newTransaction, setNewTransaction] = useState({ type: 'expense', amount: '', description: '' });
+
+  useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser);
         const name = parsed.username || parsed.name || 'User';
+        const email = parsed.email || '';
         setUserName(name);
-        
-        // Add welcome message
-        setMessages([{
-          id: 'welcome',
-          text: `Hello ${name}, how can I help you today?`,
-          isUser: false,
-          timestamp: new Date()
-        }]);
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
+        setUserEmail(email);
+        setMessages([{ id: 'welcome', text: `Hello ${name}, I am your HCL Intelligent Assistant. How can I facilitate your operations today?`, isUser: false, timestamp: new Date() }]);
+      } catch (error) { console.error('Error parsing user data:', error); }
     }
   }, []);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    router.push('/');
+  };
+
+  const scheduleMeetingNotification = async (action: Record<string, unknown>) => {
+    try {
+      // Get latest email from localStorage as backup to state (prevents stale closures/initialization issues)
+      let currentEmail = userEmail;
+      if (!currentEmail) {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            currentEmail = parsed.email || '';
+          } catch {}
+        }
+      }
+
+      const backendUrl = process.env.NEXT_PUBLIC_ML_BACKEND || 'http://localhost:8000';
+      const payload = {
+        topic: action.topic || 'Meeting',
+        date: action.date || 'TBD',
+        time: action.time || 'TBD',
+        location: action.location || 'Virtual',
+        participants: action.participants || [],
+        participant_emails: action.participant_emails || [],
+        organizer_email: currentEmail,
+        organizer_name: userName, // Pass the dynamic user name
+      };
+      const res = await fetch(`${backendUrl}/api/schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.status === 'success' || data.status === 'partial') setScheduleStatus(`✅ ${data.summary}`);
+      else setScheduleStatus(`⚠️ Meeting saved locally. ${data.summary}`);
+    } catch (err) {
+      console.error('Schedule notification error:', err);
+      setScheduleStatus('⚠️ Meeting saved locally (Backend Offline).');
+    }
+    setTimeout(() => setScheduleStatus(null), 8000);
+  };
+
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
-    
-    const userMsg: Message = {
-      id: `user-${Date.now()}`,
-      text: input,
-      isUser: true,
-      timestamp: new Date()
-    };
-    
+    const userMsg: Message = { id: `user-${Date.now()}`, text: input, isUser: true, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
     const currentInput = input;
     setInput('');
     setIsLoading(true);
-    
     try {
-      // Call your ML model API endpoint here
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          message: currentInput,
-          user: userName,
-          conversationHistory: messages.map(m => ({
-            role: m.isUser ? 'user' : 'assistant',
-            content: m.text
-          }))
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: currentInput, user: userName, conversationHistory: messages.map(m => ({ role: m.isUser ? 'user' : 'assistant', content: m.text })) })
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-      
       const data = await response.json();
-      
-      const botMsg: Message = {
-        id: `bot-${Date.now()}`,
-        text: data.reply || data.message || "I'm here to help! How can I assist you?",
-        isUser: false,
-        timestamp: new Date(),
-        metadata: data.metadata
-      };
-      
-      setMessages(prev => [...prev, botMsg]);
+      const replyText = data.reply || data.message || "I'm here to help!";
+      try {
+        const parsed = JSON.parse(replyText);
+        if (parsed.action_data && parsed.action_data.action === 'schedule_meeting') {
+          const action = parsed.action_data;
+          const newMeeting: Meeting = { id: `meet-${Date.now()}`, title: action.topic || 'New Meeting', date: action.date || 'TBD', time: action.time || 'TBD', participants: Array.isArray(action.participants) ? action.participants : [action.participants], status: 'scheduled' };
+          setMeetings(prev => [newMeeting, ...prev]);
+          scheduleMeetingNotification(action);
+        }
+      } catch { }
+      setMessages(prev => [...prev, { id: `bot-${Date.now()}`, text: replyText, isUser: false, timestamp: new Date(), metadata: data.metadata }]);
     } catch (error) {
       console.error('Chat error:', error);
-      const errorMsg: Message = {
-        id: `error-${Date.now()}`,
-        text: "I'm having trouble connecting right now. Please try again in a moment.",
-        isUser: false,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMsg]);
-    } finally {
-      setIsLoading(false);
-    }
+      setMessages(prev => [...prev, { id: `error-${Date.now()}`, text: "I encountered a communication error. Please try again.", isUser: false, timestamp: new Date() }]);
+    } finally { setIsLoading(false); }
   };
 
   const newChat = () => {
-    setMessages([{
-      id: 'welcome',
-      text: `Hello ${userName}, how can I help you today?`,
-      isUser: false,
-      timestamp: new Date()
-    }]);
+    setMessages([{ id: 'welcome', text: `Hello ${userName}, how can I help you today?`, isUser: false, timestamp: new Date() }]);
     setInput('');
-  };
-
-  const handleLogout = () => {
-    // Clear user from localStorage
-    localStorage.removeItem('user');
-    
-    // Optional: Clear other app data
-    // localStorage.clear(); // Uncomment to clear all localStorage
-    
-    // Redirect to login page or home page
-    // Update the path based on your app's routing
-    window.location.href = '/'; // or '/login' depending on your setup
-  };
-
-  const createTicket = () => {
-    if (!newTicket.title || !newTicket.description) return;
-
-    const ticket: Ticket = {
-      id: `ticket-${Date.now()}`,
-      title: newTicket.title,
-      status: 'open',
-      priority: newTicket.priority as 'low' | 'medium' | 'high',
-      createdAt: new Date().toISOString().split('T')[0],
-      description: newTicket.description
-    };
-
-    setTickets(prev => [ticket, ...prev]);
-    setNewTicket({ title: '', priority: 'medium', description: '' });
-  };
-
-  const addTransaction = () => {
-    if (!newTransaction.amount || !newTransaction.description) return;
-
-    const transaction: Transaction = {
-      id: `txn-${Date.now()}`,
-      type: newTransaction.type,
-      amount: parseFloat(newTransaction.amount),
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      description: newTransaction.description
-    };
-
-    setTransactions(prev => [transaction, ...prev]);
-    setNewTransaction({ type: 'expense', amount: '', description: '' });
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-yellow-500';
-      case 'in-progress': return 'bg-blue-500';
-      case 'closed': return 'bg-green-500';
-      case 'completed': return 'bg-green-500';
-      case 'pending': return 'bg-orange-500';
-      case 'scheduled': return 'bg-purple-500';
-      default: return 'bg-gray-500';
+      case 'open': return 'border-yellow-500/30 text-yellow-500';
+      case 'in-progress': return 'border-blue-500/30 text-blue-400';
+      case 'completed': return 'border-green-500/30 text-green-400';
+      case 'scheduled': return 'border-purple-500/30 text-purple-400';
+      default: return 'border-white/10 text-slate-400';
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const NavCard = ({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) => (
-    <Card 
-      className="bg-slate-800/30 border-slate-700/50 hover:bg-slate-700/40 transition-all cursor-pointer h-24 flex items-center justify-center"
-      onClick={onClick}
-    >
-      <CardContent className="p-0 flex flex-col items-center gap-2">
-        <span className="text-3xl">{icon}</span>
-        <span className="text-xs font-semibold text-white">{label}</span>
-      </CardContent>
-    </Card>
+  const NavItem = ({ icon, label, onClick, active = false }: { icon: string; label: string; onClick: () => void; active?: boolean }) => (
+    <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${active ? 'bg-white/10 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+      <span className="text-xl group-hover:scale-110 transition-transform">{icon}</span>
+      <span className="text-sm font-medium">{label}</span>
+    </button>
   );
 
+  const renderMessageContent = (msg: Message) => {
+    try {
+      if (msg.text.trim().startsWith('{') && msg.text.trim().endsWith('}')) {
+        const data = JSON.parse(msg.text);
+        if (data.title && data.direct_answer) {
+          return (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+                <span className="text-xl">📊</span>
+                <h3 className="text-white font-bold tracking-tight">{data.title.replace('Answer: ', '')}</h3>
+                <Badge variant="outline" className="ml-auto border-blue-500/30 text-blue-400 text-[10px]">{data.confidence_score} CONFIDENCE</Badge>
+              </div>
+              <p className="text-slate-200 text-sm">{data.direct_answer}</p>
+              {data.key_insights && (
+                <ul className="space-y-2">
+                  {data.key_insights.map((insight: string, idx: number) => (
+                    <li key={idx} className="flex gap-2 text-slate-300 text-xs bg-white/5 p-2 rounded-lg border border-white/5">
+                      <span className="text-blue-400">•</span>
+                      <span>{insight}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+        }
+      }
+    } catch { }
+    return <div className="prose prose-invert prose-sm max-w-none [&_p]:text-slate-200"><ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown></div>;
+  };
+
   return (
-    <div className="h-screen bg-[#0a0e27] flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-[#0d1228] border-r border-slate-800/50 flex flex-col">
-        {/* Logo */}
-        <div className="h-16 flex items-center px-4 border-b border-slate-800/50">
-          <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center text-white font-bold">
-            H
-          </div>
-          <h1 className="ml-3 text-white font-bold text-lg">HCL Assistant</h1>
-        </div>
-
-        {/* User Profile */}
-        <div className="p-4 border-b border-slate-800/50">
-          <Card className="bg-slate-800/30 border-slate-700/50">
-            <CardContent className="p-3 flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {userName.substring(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-white font-semibold text-sm">{userName}</p>
-                <p className="text-cyan-400 text-xs">Global Innovation</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* New Chat Button */}
-        <div className="p-4 border-b border-slate-800/50">
-          <Button 
-            onClick={newChat}
-            className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white"
-          >
-            ➕ New Chat
-          </Button>
-        </div>
-
-        {/* Intelligence Hub */}
-        <div className="p-4">
-          <h3 className="text-cyan-400 text-xs font-bold mb-3 tracking-wider">INTELLIGENCE HUB</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <NavCard icon="💼" label="FINANCE" onClick={() => setFinanceDialog(true)} />
-            <NavCard icon="🎫" label="TICKETS" onClick={() => setTicketsDialog(true)} />
-            <NavCard icon="📅" label="MEETS" onClick={() => setMeetsDialog(true)} />
-            <NavCard icon="🔓" label="ACCESS" onClick={() => setAccessDialog(true)} />
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="flex-1 p-4 overflow-auto">
-          <h3 className="text-cyan-400 text-xs font-bold mb-3 tracking-wider">RECENT ACTIVITY</h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-              <span className="text-slate-300">10:15 - System Auth</span>
+    <div className="flex h-screen bg-[#090a1a] text-white font-sans overflow-hidden">
+      <aside className="w-64 border-r border-white/5 flex flex-col bg-black/20 backdrop-blur-3xl">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <span className="font-bold text-lg">H</span>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-              <span className="text-slate-300">10:30 - Revenue Check</span>
+            <div>
+              <h1 className="font-bold text-lg tracking-tight">HCL<span className="text-blue-500">.</span>Tech</h1>
+              <p className="text-[10px] text-slate-500 font-medium tracking-[0.2em] uppercase">Intelligence</p>
+            </div>
+          </div>
+          <nav className="space-y-2">
+            <NavItem icon="🏠" label="Dashboard" onClick={() => {}} active />
+            <NavItem icon="💼" label="Finance" onClick={() => setFinanceDialog(true)} />
+            <NavItem icon="🎫" label="Support" onClick={() => setTicketsDialog(true)} />
+            <NavItem icon="📅" label="Calendar" onClick={() => setMeetsDialog(true)} />
+            <NavItem icon="🔓" label="Access" onClick={() => setAccessDialog(true)} />
+            <NavItem icon="📚" label="Knowledge" onClick={() => window.open('/docs.html', '_blank')} />
+          </nav>
+        </div>
+        <div className="flex-1 px-6 py-4 overflow-auto">
+          <h3 className="text-[10px] font-bold text-slate-500 tracking-widest uppercase mb-4">Timeline</h3>
+          <div className="space-y-6 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1px] before:bg-white/10">
+            <div className="relative pl-6">
+              <div className="absolute left-0 top-1 w-3.5 h-3.5 rounded-full bg-blue-500/20 border-2 border-blue-500 glow-blue"></div>
+              <p className="text-[10px] text-slate-400">10:45 AM Sync</p>
             </div>
           </div>
         </div>
-
-        {/* Logout Button */}
-        <div className="p-4 border-t border-slate-800/50">
-          <Button 
-  onClick={handleLogout}
-  className="w-full bg-gradient-to-r from-slate-700 to-slate-800 
-             hover:from-cyan-500/20 hover:to-blue-500/20 
-             border border-slate-600 text-slate-300 
-             hover:text-white hover:border-cyan-400/40 
-             transition-all duration-300"
->
-  🚪 Logout
-</Button>
-
+        <div className="p-6 border-t border-white/5 bg-white/[0.02]">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold">{userName.substring(0, 2).toUpperCase()}</div>
+            <div className="overflow-hidden">
+              <p className="text-xs font-bold truncate">{userName}</p>
+              <p className="text-[10px] text-slate-500 truncate">{userEmail}</p>
+            </div>
+          </div>
+          <Button variant="ghost" onClick={handleLogout} className="w-full justify-start text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 rounded-lg">退出 Logout</Button>
         </div>
-      </div>
+      </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Messages Area */}
-        <div className="flex-1 overflow-auto p-6">
+      <main className="flex-1 flex flex-col relative bg-gradient-premium">
+        <header className="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-black/10 backdrop-blur-md z-10">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500/30 p-0.5 glow-blue bg-slate-900">
+                <Image src="/avatar.png" alt="AI" width={48} height={48} className="object-cover" />
+              </div>
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+            </div>
+            <div>
+              <h2 className="text-sm font-bold flex items-center gap-2">HCL Assistant <Badge className="bg-blue-500/10 text-blue-400 border-0 h-4 px-1.5 text-[8px]">PRO</Badge></h2>
+              <p className="text-[10px] text-slate-400">Secure Session Active</p>
+            </div>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-auto p-8 space-y-6 scroll-smooth">
+          {scheduleStatus && (
+            <div className="animate-slide-up bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 flex items-center gap-3 text-sm text-blue-300 glass mx-auto max-w-xl">
+              <span>📅</span><p>{scheduleStatus}</p>
+            </div>
+          )}
           {messages.map((msg) => (
-            <div key={msg.id} className={`mb-6 ${msg.isUser ? 'flex justify-end' : 'flex justify-start'}`}>
-              <div className="max-w-2xl">
-                <Card className={msg.isUser ? "bg-[#1a2942] border-cyan-500/30" : "bg-slate-800/50 border-slate-700/50"}>
-                  <CardContent className="p-4 prose prose-invert max-w-none prose-sm text-white [&_*]:text-white">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {msg.text}
-                    </ReactMarkdown>
-                    <p className="text-[10px] text-slate-400 mt-2 text-right">
-                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </CardContent>
-                </Card>
+            <div key={msg.id} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'} animate-slide-up`}>
+              <div className={`p-4 rounded-3xl max-w-[80%] lg:max-w-2xl ${msg.isUser ? 'bg-blue-600 shadow-lg shadow-blue-500/20' : 'glass-card glow-purple'}`}>
+                {renderMessageContent(msg)}
+                <p className="text-[9px] mt-2 opacity-40 font-medium">{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
               </div>
             </div>
           ))}
-          {isLoading && (
-            <div className="flex justify-start mb-6">
-              <Card className="bg-slate-800/50 border-slate-700/50 max-w-2xl">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          {isLoading && <div className="flex justify-start animate-pulse"><div className="glass-card p-4 rounded-3xl flex gap-1.5"><div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div><div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-150"></div></div></div>}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
-        <div className="p-6 border-t border-slate-800/50">
-          <div className="flex gap-3 items-center">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder="Type your request here..."
-              className="flex-1 h-14 bg-[#1a2942] border-slate-700/50 text-white placeholder:text-slate-500 focus-visible:border-cyan-500 focus-visible:ring-0 rounded-full px-6"
-            />
-            <Button
-              onClick={sendMessage}
-              disabled={!input.trim() || isLoading}
-              className="h-14 w-14 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 rounded-full shadow-lg flex items-center justify-center disabled:opacity-50"
-            >
-              <span className="text-xl">➤</span>
-            </Button>
+        <div className="p-8 pt-0">
+          <div className="max-w-4xl mx-auto relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur opacity-20 group-focus-within:opacity-40 transition duration-500"></div>
+            <div className="relative flex items-center bg-[#1a1b2e]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 focus-within:border-blue-500/50">
+              <Button variant="ghost" size="icon" className="text-slate-400 shrink-0 ml-2"><span>📎</span></Button>
+              <Input value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && sendMessage()} placeholder="Ask me anything..." className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-white py-6 px-4" />
+              <Button onClick={sendMessage} disabled={!input.trim() || isLoading} className="btn-premium h-11 px-6 rounded-xl font-bold ml-2">SEND</Button>
+            </div>
           </div>
         </div>
-      </div>
+        <button onClick={newChat} className="absolute bottom-32 right-8 w-14 h-14 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-2xl shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all glow-blue group z-20"><span className="text-2xl transition-transform group-hover:rotate-90">➕</span></button>
+      </main>
 
-      {/* Finance Dialog */}
       <Dialog open={financeDialog} onOpenChange={setFinanceDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto bg-[#0d1228] border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-white text-2xl flex items-center gap-2">
-              💼 Finance Dashboard
-            </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              View and manage your financial transactions
-            </DialogDescription>
-          </DialogHeader>
-          
-          <Tabs defaultValue="transactions" className="w-full">
-            <TabsList className="bg-slate-800/50">
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="add">Add Transaction</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="transactions" className="space-y-4 mt-4">
-              {transactions.map((txn) => (
-                <Card key={txn.id} className="bg-slate-800/30 border-slate-700/50">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-white font-semibold">{txn.description}</p>
-                        <p className="text-sm text-slate-400">{txn.date}</p>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden bg-[#090a1a] border-white/10 p-0 rounded-3xl">
+          <div className="h-full flex flex-col">
+            <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+              <DialogHeader><DialogTitle className="text-2xl font-bold">💼 Finance Center</DialogTitle></DialogHeader>
+            </div>
+            <div className="flex-1 overflow-auto p-8">
+              <Tabs defaultValue="transactions">
+                <TabsList className="bg-white/5 border border-white/10 p-1 rounded-xl mb-6">
+                  <TabsTrigger value="transactions">Ledger</TabsTrigger>
+                  <TabsTrigger value="add">New Entry</TabsTrigger>
+                </TabsList>
+                <TabsContent value="transactions" className="space-y-3">
+                  {transactions.map(txn => (
+                    <div key={txn.id} className="glass-card rounded-2xl p-4 flex justify-between items-center">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${txn.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>{txn.type === 'income' ? '↓' : '↑'}</div>
+                        <div><p className="font-bold text-sm">{txn.description}</p><p className="text-[10px] text-slate-500">{txn.date}</p></div>
                       </div>
                       <div className="text-right">
-                        <p className={`text-lg font-bold ${txn.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
-                          {txn.type === 'income' ? '+' : '-'}${txn.amount.toFixed(2)}
-                        </p>
-                        <Badge className={`${getStatusColor(txn.status)} text-xs`}>
-                          {txn.status}
-                        </Badge>
+                        <p className="text-lg font-bold">${txn.amount.toLocaleString()}</p>
+                        <Badge variant="outline" className={getStatusColor(txn.status)}>{txn.status}</Badge>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-            
-            <TabsContent value="add" className="space-y-4 mt-4">
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-white">Type</Label>
-                  <Select value={newTransaction.type} onValueChange={(val) => setNewTransaction({...newTransaction, type: val})}>
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="expense">Expense</SelectItem>
-                      <SelectItem value="income">Income</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-white">Amount</Label>
-                  <Input
-                    type="number"
-                    value={newTransaction.amount}
-                    onChange={(e) => setNewTransaction({...newTransaction, amount: e.target.value})}
-                    placeholder="0.00"
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
-                </div>
-                <div>
-                  <Label className="text-white">Description</Label>
-                  <Input
-                    value={newTransaction.description}
-                    onChange={(e) => setNewTransaction({...newTransaction, description: e.target.value})}
-                    placeholder="Enter description"
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
-                </div>
-                <Button onClick={addTransaction} className="w-full bg-gradient-to-r from-cyan-400 to-blue-500">
-                  Add Transaction
-                </Button>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="analytics" className="mt-4">
-              <Card className="bg-slate-800/30 border-slate-700/50">
-                <CardContent className="p-6">
-                  <h3 className="text-white font-semibold mb-4">Summary</h3>
+                  ))}
+                </TabsContent>
+                <TabsContent value="add" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-slate-400 text-sm">Total Income</p>
-                      <p className="text-2xl font-bold text-green-400">
-                        ${transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0).toFixed(2)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-slate-400 text-sm">Total Expenses</p>
-                      <p className="text-2xl font-bold text-red-400">
-                        ${transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0).toFixed(2)}
-                      </p>
-                    </div>
+                    <div className="space-y-2"><Label>Type</Label><Select value={newTransaction.type} onValueChange={v => setNewTransaction({...newTransaction, type: v})}><SelectTrigger className="bg-white/5 border-white/10"><SelectValue /></SelectTrigger><SelectContent className="bg-[#090a1a] border-white/10"><SelectItem value="expense">Expense</SelectItem><SelectItem value="income">Income</SelectItem></SelectContent></Select></div>
+                    <div className="space-y-2"><Label>Amount</Label><Input type="number" value={newTransaction.amount} onChange={e => setNewTransaction({...newTransaction, amount: e.target.value})} className="bg-white/5 border-white/10" placeholder="0.00" /></div>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                  <Input value={newTransaction.description} onChange={e => setNewTransaction({...newTransaction, description: e.target.value})} className="bg-white/5 border-white/10" placeholder="Description..." />
+                  <Button onClick={() => { if (!newTransaction.amount || !newTransaction.description) return; setTransactions([{ id: Date.now().toString(), type: newTransaction.type, amount: parseFloat(newTransaction.amount), description: newTransaction.description, date: new Date().toISOString().split('T')[0], status: 'completed' }, ...transactions]); setNewTransaction({type:'expense', amount:'', description:''}); }} className="w-full btn-premium py-6 rounded-xl font-bold">Add</Button>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Tickets Dialog */}
       <Dialog open={ticketsDialog} onOpenChange={setTicketsDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto bg-[#0d1228] border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-white text-2xl flex items-center gap-2">
-              🎫 Support Tickets
-            </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              Create and track support tickets
-            </DialogDescription>
-          </DialogHeader>
-          
-          <Tabs defaultValue="tickets" className="w-full">
-            <TabsList className="bg-slate-800/50">
-              <TabsTrigger value="tickets">All Tickets</TabsTrigger>
-              <TabsTrigger value="create">Create Ticket</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="tickets" className="space-y-4 mt-4">
-              {tickets.map((ticket) => (
-                <Card key={ticket.id} className="bg-slate-800/30 border-slate-700/50">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="text-white font-semibold">{ticket.title}</p>
-                        <p className="text-sm text-slate-400 mt-1">{ticket.description}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Badge className={`${getPriorityColor(ticket.priority)} text-xs`}>
-                          {ticket.priority}
-                        </Badge>
-                        <Badge className={`${getStatusColor(ticket.status)} text-xs`}>
-                          {ticket.status}
-                        </Badge>
-                      </div>
-                    </div>
-                    <p className="text-xs text-slate-500">Created: {ticket.createdAt}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-            
-            <TabsContent value="create" className="space-y-4 mt-4">
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-white">Title</Label>
-                  <Input
-                    value={newTicket.title}
-                    onChange={(e) => setNewTicket({...newTicket, title: e.target.value})}
-                    placeholder="Enter ticket title"
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
-                </div>
-                <div>
-                  <Label className="text-white">Priority</Label>
-                  <Select value={newTicket.priority} onValueChange={(val) => setNewTicket({...newTicket, priority: val})}>
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-white">Description</Label>
-                  <Textarea
-                    value={newTicket.description}
-                    onChange={(e) => setNewTicket({...newTicket, description: e.target.value})}
-                    placeholder="Describe the issue..."
-                    className="bg-slate-800/50 border-slate-700 text-white min-h-[100px]"
-                  />
-                </div>
-                <Button onClick={createTicket} className="w-full bg-gradient-to-r from-cyan-400 to-blue-500">
-                  Create Ticket
-                </Button>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden bg-[#090a1a] border-white/10 p-0 rounded-3xl">
+          <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+            <DialogHeader><DialogTitle className="text-2xl font-bold">🎫 Support</DialogTitle></DialogHeader>
+          </div>
+          <div className="p-8 overflow-auto space-y-4">
+            {tickets.map(ticket => (
+              <div key={ticket.id} className="glass-card rounded-2xl p-5 border-l-4 border-l-blue-500 transition-all hover:translate-x-1">
+                <div className="flex justify-between items-start mb-2"><h4 className="font-bold text-white">{ticket.title}</h4><Badge variant="outline" className={getStatusColor(ticket.status)}>{ticket.status}</Badge></div>
+                <p className="text-xs text-slate-400 mb-4">{ticket.description}</p>
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Priority: <span className={ticket.priority === 'high' ? 'text-red-400' : 'text-blue-400'}>{ticket.priority}</span></div>
               </div>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
-
-      {/* Meetings Dialog */}
-      <Dialog open={meetsDialog} onOpenChange={setMeetsDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto bg-[#0d1228] border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-white text-2xl flex items-center gap-2">
-              📅 Meetings
-            </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              View and manage your meetings
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 mt-4">
-            {meetings.map((meeting) => (
-              <Card key={meeting.id} className="bg-slate-800/30 border-slate-700/50">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-white font-semibold text-lg">{meeting.title}</p>
-                      <p className="text-sm text-slate-400 mt-1">
-                        📅 {meeting.date} at {meeting.time}
-                      </p>
-                      <p className="text-sm text-slate-400 mt-1">
-                        👥 {meeting.participants.join(', ')}
-                      </p>
-                    </div>
-                    <Badge className={`${getStatusColor(meeting.status)} text-xs`}>
-                      {meeting.status}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
             ))}
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Access Dialog */}
+      <Dialog open={meetsDialog} onOpenChange={setMeetsDialog}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden bg-[#090a1a] border-white/10 p-0 rounded-3xl">
+          <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+            <DialogHeader><DialogTitle className="text-2xl font-bold">📅 Meetings</DialogTitle></DialogHeader>
+          </div>
+          <div className="p-8 overflow-auto space-y-4">
+            {meetings.map(meeting => (
+              <div key={meeting.id} className="glass-card rounded-2xl p-5 flex justify-between items-center">
+                <div><h4 className="font-bold text-white mb-1">{meeting.title}</h4><p className="text-[10px] text-slate-400">{meeting.date} • {meeting.time}</p></div>
+                <Badge variant="outline" className={getStatusColor(meeting.status)}>{meeting.status}</Badge>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={accessDialog} onOpenChange={setAccessDialog}>
-        <DialogContent className="max-w-2xl bg-[#0d1228] border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-white text-2xl flex items-center gap-2">
-              🔓 Access Management
-            </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              Manage permissions and access controls
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 mt-4">
-            <Card className="bg-slate-800/30 border-slate-700/50">
-              <CardContent className="p-4">
-                <h3 className="text-white font-semibold mb-3">Your Permissions</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Finance Access</span>
-                    <Badge className="bg-green-500">Granted</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Ticket Management</span>
-                    <Badge className="bg-green-500">Granted</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Meeting Scheduling</span>
-                    <Badge className="bg-green-500">Granted</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Admin Panel</span>
-                    <Badge className="bg-red-500">Denied</Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-slate-800/30 border-slate-700/50">
-              <CardContent className="p-4">
-                <h3 className="text-white font-semibold mb-3">Request Access</h3>
-                <p className="text-slate-400 text-sm mb-3">
-                  Need additional permissions? Contact your administrator.
-                </p>
-                <Button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500">
-                  Request Access
-                </Button>
-              </CardContent>
-            </Card>
+        <DialogContent className="max-w-md bg-[#090a1a] border-white/10 rounded-3xl p-8">
+          <DialogHeader className="mb-6"><DialogTitle className="text-2xl font-bold">🔓 Access</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            {['Cloud Storage', 'Financial Ledger'].map((label, i) => (
+              <div key={i} className="flex justify-between items-center p-4 glass-card rounded-2xl"><span className="text-sm font-medium">{label}</span><span className="text-[10px] font-bold uppercase text-green-400">Granted</span></div>
+            ))}
+            <Button className="w-full btn-premium py-6 rounded-xl font-bold">Request More</Button>
           </div>
         </DialogContent>
       </Dialog>

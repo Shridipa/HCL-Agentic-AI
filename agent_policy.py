@@ -22,16 +22,11 @@ def decide_next_step(intent_data, sentiment_data, entities, retrieval_score=0.0,
 
                                                      
 
-    if intent.startswith("ask_") and retrieval_score >= rag_threshold:
-
+    if (intent.startswith("ask_") or intent == "ask_general") and retrieval_score >= rag_threshold:
         return {
-
             "next_step": "answer",
-
             "missing_entities": [],
-
             "reason": f"Sufficient retrieval score ({retrieval_score:.2f}) for grounded informational query."
-
         }
 
     if (is_urgent or sentiment == "negative") and confidence < 0.4:
@@ -139,14 +134,10 @@ def decide_next_step(intent_data, sentiment_data, entities, retrieval_score=0.0,
 
             
 
-    if intent.startswith("ask_") and retrieval_score < rag_threshold:
-
+    if (intent.startswith("ask_") or intent == "ask_general") and retrieval_score < rag_threshold:
         return {
-
             "next_step": "escalate",
-
             "reason": f"I couldn't find enough reliable information (score: {retrieval_score:.2f}) in the dataset to answer this accurately."
-
         }
 
         

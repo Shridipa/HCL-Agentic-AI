@@ -1,0 +1,20 @@
+{
+  "site_package_search_strategy": "all",
+  "source_directories": [
+    {
+      "import_root": ".",
+      "source": "."
+    }
+  ],
+  "search_path": [
+    ".venv/Lib/site-packages"
+  ],
+  "exclude": [
+    ".venv",
+    "__pycache__",
+    ".next",
+    "node_modules"
+  ],
+  "ignore_all_errors": false,
+  "workers": 1
+}

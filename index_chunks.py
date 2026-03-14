@@ -88,13 +88,13 @@ def search_index(query, index_path, mapping_path, k=5):
 
     for i in range(k):
 
-        idx = indices[0][i]
+        idx = indices[0][i]  # type: ignore
 
         if idx < len(chunks):
 
             results.append({
 
-                "score": float(distances[0][i]),
+                "score": float(distances[0][i]),  # type: ignore
 
                 "metadata": chunks[idx]
 
