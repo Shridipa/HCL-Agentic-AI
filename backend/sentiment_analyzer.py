@@ -4,116 +4,44 @@ import sys
 
 import re
 
-from transformers import pipeline
+from groq import Groq
+import os
 
-sentiment_pipeline = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
-
-zero_shot_pipeline = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
+def get_groq_client():
+    from dotenv import load_dotenv
+    load_dotenv()
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def analyze_sentiment_and_urgency(query):
     if isinstance(query, list): query = " ".join([str(x) for x in query])
     if isinstance(query, dict): query = query.get("text", str(query))
     if not isinstance(query, str): query = str(query)
     if not query or not query.strip():
+        return {"sentiment": "neutral", "is_urgent": False, "urgency": "low", "signals": []}
 
-        return {"sentiment": "neutral", "is_urgent": False, "signals": []}
-
-        
-
-    sentiment_result = sentiment_pipeline(query)[0]
-
-    label = sentiment_result['label'].lower()
-
-    score = sentiment_result['score']
-
-    
-
-    question_keywords = ["what", "how", "who", "where", "when", "why", "revenue", "profit", "ebitda", "growth"]
-
-    is_question = any(query.lower().startswith(kw) for kw in question_keywords) or "?" in query
-
-    
-
-    if label == "positive" and score > 0.85:
-
-        final_sentiment = "positive"
-
-    elif label == "negative" and score > 0.85 and not is_question:
-
-        final_sentiment = "negative"
-
-    else:
-
-        final_sentiment = "neutral"
-
-        
-
-    candidate_labels = ["urgent assistance required", "informational or general inquiry"]
-
-    urgency_result = zero_shot_pipeline(query, candidate_labels)
-
-    
-
-    is_urgent_ml = (
-
-        urgency_result['labels'][0] == "urgent assistance required" 
-
-        and urgency_result['scores'][0] > 0.85
-
+    system_prompt = (
+        "Analyze the sentiment and urgency of the user query for enterprise support. "
+        "Return ONLY a JSON object with: "
+        "'sentiment' (positive/negative/neutral), "
+        "'is_urgent' (boolean), "
+        "'urgency' (high/medium/low), "
+        "'signals' (array of urgent keywords found)."
     )
-
     
-
-    urgency_signals = []
-
-    keywords = [
-
-        r"\basap\b", r"\burgent\b", r"\bcritical\b", r"\bimmediately\b", 
-
-        r"\bfire\b", r"\bemergency\b", r"\bstuck\b", 
-
-        r"\bblocking\b", r"\bdeadline\b",
-
-        r"\(urgent\)", r"\(asap\)", r"\(critical\)" 
-
-    ]
-
-    
-
-    for kw in keywords:
-
-        if re.search(kw, query, re.IGNORECASE):
-
-            signal_name = re.sub(r'\\b|\(|\)', '', kw)
-
-            urgency_signals.append(signal_name)
-
-            
-
-    final_urgent = is_urgent_ml or len(urgency_signals) > 0
-
-    
-
-    if not final_urgent and (label == "negative" and score < 0.9):
-
-         final_sentiment = "neutral"
-
-    
-
-    # Determine urgency level
-    if final_urgent and len(urgency_signals) >= 2:
-        urgency_level = "high"
-    elif final_urgent:
-        urgency_level = "medium"
-    else:
-        urgency_level = "low"
-    
-    return {
-        "sentiment": final_sentiment,
-        "is_urgent": final_urgent,
-        "urgency": urgency_level,  # Added for compatibility with main_assistant.py
-        "signals": urgency_signals
-    }
+    try:
+        client = get_groq_client()
+        response = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Query: {query}"},
+            ],
+            model="llama-3.3-70b-versatile",
+            response_format={"type": "json_object"}
+        )
+        return json.loads(response.choices[0].message.content)
+    except Exception as e:
+        print(f"Groq Sentiment Error: {e}")
+        return {"sentiment": "neutral", "is_urgent": False, "urgency": "low", "signals": []}
 
 if __name__ == "__main__":
 

@@ -3,7 +3,7 @@ import sys
 import os
 import re
 from typing import Any
-from transformers import pipeline
+# Enterprise AI Core Modules
 from intent_detector import detect_intent
 from ner_extractor import extract_entities
 from sentiment_analyzer import analyze_sentiment_and_urgency
@@ -13,31 +13,22 @@ from action_generator import generate_action_json
 from clarifier import generate_clarification
 from citation_enforcer import verify_and_enforce_citations
 from ui_formatter import format_ui_response
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-import torch
 from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
 _model = None
 _tokenizer = None
 
 def get_fallback_model():
-    global _model, _tokenizer
-    if _model is None:
-        model_name = "google/flan-t5-small"
-        _tokenizer = AutoTokenizer.from_pretrained(model_name)
-        _model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
-    return _tokenizer, _model
+    # Disabled for memory optimization - using Groq for everything
+    return None, None
 
 def generator(prompt, max_new_tokens=100, **kwargs):
-    tokenizer, model = get_fallback_model()
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024).to(device)
-    outputs = model.generate(**inputs, max_new_tokens=max_new_tokens)
-    return [{"generated_text": tokenizer.decode(outputs[0], skip_special_tokens=True)}]
+    # This is a legacy function replaced by Groq synthesization
+    return [{"generated_text": "Error: Local generator is disabled for memory optimization."}]
 
 def synthesize_answer(query, chunks):
     if isinstance(query, list): query = " ".join([str(x) for x in query])

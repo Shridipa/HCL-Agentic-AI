@@ -15,15 +15,12 @@ def get_embedding_model():
     global _embedding_model
     if _embedding_model is None:
         from sentence_transformers import SentenceTransformer
-        _embedding_model = SentenceTransformer('all-mpnet-base-v2')
+        _embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
     return _embedding_model
 
 def get_rerank_model():
-    global _rerank_model
-    if _rerank_model is None:
-        from sentence_transformers import CrossEncoder
-        _rerank_model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
-    return _rerank_model
+    # Disabled for memory optimization on Render
+    return None
 
 _cached_index = None
 
@@ -238,85 +235,7 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
                                                                           
 
     sorted_candidates = sorted(candidate_map.values(), key=lambda x: x["rrf_score"], reverse=True)
-
-    rerank_pool = sorted_candidates[:300]
-
-    if not rerank_pool: return []
-
-                                                                   
-
-    pairs = [[query_clean, c['content']] for c in rerank_pool]
-    rerank_scores = get_rerank_model().predict(pairs)
-
-    
-
-    for i, candidate in enumerate(rerank_pool):
-
-        boost = 0.0
-
-        content_lower = candidate['content'].lower()
-
-        
-
-                                          
-
-        important_names = ["vijaykumar", "roshni", "nadar", "hcltech", "hcl software", "hcl", "vijayakumar", "shiv", "walia", "inspeq", "ethisphere", "forbes", "newsweek", "microsoft", "google", "dell", "intel", "subsidiary", "india", "incorporated", "financial", "asset", "capital"]
-
-        for name in important_names:
-
-            if name in query_clean.lower() and name in content_lower:
-
-                boost += 12.0
-
-        
-
-                                             
-
-        query_numbers = re.findall(r'\b\d{2,}\b', query_clean)
-
-        for num in query_numbers:
-
-            if num in candidate['content']:
-
-                boost += 10.0
-
-        
-
-                                                                        
-
-        if any(kw in query_clean.lower() for kw in ["revenue", "profit", "report", "rsus", "payment", "date", "incorporate", "company", "what is"]):
-
-            boilerplate_kws = ["forward-looking", "terms of use", "table of contents", "index", "notice of", "cautionary", "disclaimer"]
-
-            if any(bk in content_lower for bk in boilerplate_kws):
-
-                boost = boost - 10.0
-
-            
-
-                                                                                   
-
-            if len(candidate['content'].split()) < 40:
-
-                boost -= 5.0
-
-            
-
-        candidate["score"] = float(rerank_scores[i]) + boost
-
-        
-
-                                                                              
-
-        if query_clean.lower() in content_lower:
-
-            candidate["score"] += 25.0
-
-        candidate["vector_distance"] = float(distances_sem[0][i]) if i < len(distances_sem[0]) else 100.0
-
-    rerank_pool.sort(key=lambda x: x['score'], reverse=True)
-
-    return rerank_pool[:k]
+    return sorted_candidates[:k]
 
 def format_rag_prompt(user_query, retrieved_chunks):
 

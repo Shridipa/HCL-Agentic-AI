@@ -4,16 +4,46 @@ import sys
 
 import os
 
-_classifier = None
+from groq import Groq
 
-def get_classifier():
-    global _classifier
-    if _classifier is None:
-        from transformers import pipeline
-        _classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
-    return _classifier
+def get_groq_client():
+    from dotenv import load_dotenv
+    load_dotenv()
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def detect_intent(query, context="", previous_intent=None):
+    if isinstance(query, list): query = " ".join([str(x) for x in query])
+    if isinstance(query, dict): query = query.get("text", str(query))
+    if not isinstance(query, str): query = str(query)
+    
+    if not query or not query.strip():
+        return {"intent": "other", "confidence": 0.0, "rationale": "Empty query."}
+
+    system_prompt = (
+        "You are an enterprise intent classifier for HCLTech AI. "
+        "Classify the user query into ONE of these categories: "
+        "ask_finance, ask_hr, ask_it_policy, ask_dev, ask_compliance, ask_procurement, ask_security, action_ticket, action_access, action_schedule, ask_people, other. "
+        "Return ONLY a JSON object with 'intent', 'confidence' (0.0-1.0), and 'rationale'."
+    )
+    
+    try:
+        client = get_groq_client()
+        response = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Query: {query}\nPrevious Intent: {previous_intent}"},
+            ],
+            model="llama-3.3-70b-versatile",
+            response_format={"type": "json_object"}
+        )
+        return json.loads(response.choices[0].message.content)
+    except Exception as e:
+        print(f"Groq Intent Detection Error: {e}")
+        # Fallback to simple keyword logic if Groq fails
+        query_lower = query.lower()
+        if "revenue" in query_lower or "profit" in query_lower:
+            return {"intent": "ask_finance", "confidence": 0.8, "rationale": "Keyword fallback."}
+        return {"intent": "other", "confidence": 0.5, "rationale": f"Fallback due to error: {e}"}
     if isinstance(query, list): query = " ".join([str(x) for x in query])
     if isinstance(query, dict): query = query.get("text", str(query))
     if not isinstance(query, str): query = str(query)
