@@ -4,11 +4,11 @@ This guide explains how to deploy the Next.js frontend of the HCL-Agentic-AI pro
 
 ## 1. Project Configuration
 
-The project is already configured with a `vercel.json` file in the root directory:
+The project is configured with a `vercel.json` file inside the `frontend` directory:
 ```json
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "frontend/.next",
+  "outputDirectory": ".next",
   "framework": "nextjs"
 }
 ```
