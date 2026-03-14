@@ -5,14 +5,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { message, user, conversationHistory } = body;
 
-    const endpoint = process.env.ML_MODEL_ENDPOINT;
+    let endpoint = process.env.ML_MODEL_ENDPOINT || 
+                   process.env.NEXT_PUBLIC_ML_BACKEND || 
+                   process.env.NEXT_API_URL;
     
     if (!endpoint) {
-      console.error("Missing ML_MODEL_ENDPOINT environment variable");
+      console.error("Missing Backend URL environment variable (checked ML_MODEL_ENDPOINT, NEXT_PUBLIC_ML_BACKEND, NEXT_API_URL)");
       return NextResponse.json(
-        { error: "Server configuration error: ML_MODEL_ENDPOINT is missing" },
+        { error: "Server configuration error: Backend URL is missing" },
         { status: 500 }
       );
+    }
+
+    // Ensure it's the full API path
+    if (!endpoint.endsWith('/api/chat')) {
+      endpoint = `${endpoint.replace(/\/$/, '')}/api/chat`;
     }
 
     console.log(`Forwarding chat request to: ${endpoint}`);
