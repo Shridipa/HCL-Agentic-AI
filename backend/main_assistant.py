@@ -16,7 +16,8 @@ from ui_formatter import format_ui_response
 from groq import Groq
 from dotenv import load_dotenv
 
-load_dotenv()
+import pathlib
+load_dotenv(dotenv_path=pathlib.Path(__file__).parent.parent / ".env", override=True)
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 _model = None
@@ -110,9 +111,9 @@ def synthesize_answer(query, chunks):
         )
         synthesized = chat_completion.choices[0].message.content.strip()
     except Exception as e:
-        print(f"Groq API Error: {e}. Falling back to simple response.")
+        print(f"Groq API Error [{type(e).__name__}]: {repr(e)}")
         return json.dumps({
-            "title": f"Answer: {str(query)[0:30]}...",  # type: ignore[index]
+            "title": f"Answer: {str(query)[0:30]}...",
             "direct_answer": "I'm having trouble reaching my high-performance engine for this specific query. Based on the documentation, I can confirm the information is available.",
             "key_insights": ["API connection bottleneck", "Local fallback active"],
             "strategic_context": "System experiencing high latency or network issues.",
@@ -355,14 +356,37 @@ def run_pipeline(user_query, history=None):
                 })
         else:
             retrieval_score = 0.0
-            rag_answer = json.dumps({
-                "title": "Search Status: No Matches",
-                "direct_answer": "I could not find any information related to this query in the provided documents.",
-                "key_insights": [],
-                "strategic_context": "Zero relevant document chunks were retrieved for the given query.",
-                "citations": [],
-                "confidence_score": "Low"
-            })
+            # Try a direct Groq answer for general questions with no RAG match
+            if is_informational_query:
+                try:
+                    direct_completion = groq_client.chat.completions.create(
+                        messages=[
+                            {"role": "system", "content": "You are the HCLTech Enterprise AI Assistant. Answer questions about HCLTech, its leadership, products, and strategy concisely and professionally. Return a JSON object with keys: title, direct_answer, key_insights (list of strings), strategic_context, citations (empty list), confidence_score."},
+                            {"role": "user", "content": user_query},
+                        ],
+                        model="llama-3.3-70b-versatile",
+                        response_format={"type": "json_object"}
+                    )
+                    rag_answer = direct_completion.choices[0].message.content.strip()
+                except Exception as ge:
+                    print(f"Direct Groq fallback error [{type(ge).__name__}]: {repr(ge)}")
+                    rag_answer = json.dumps({
+                        "title": "Search Status: No Matches",
+                        "direct_answer": "I could not find any information related to this query in the provided documents.",
+                        "key_insights": [],
+                        "strategic_context": "Zero relevant document chunks were retrieved for the given query.",
+                        "citations": [],
+                        "confidence_score": "Low"
+                    })
+            else:
+                rag_answer = json.dumps({
+                    "title": "Search Status: No Matches",
+                    "direct_answer": "I could not find any information related to this query in the provided documents.",
+                    "key_insights": [],
+                    "strategic_context": "Zero relevant document chunks were retrieved for the given query.",
+                    "citations": [],
+                    "confidence_score": "Low"
+                })
 
     policy_decision = decide_next_step(intent_data, sentiment_data, entities, retrieval_score=retrieval_score)
     

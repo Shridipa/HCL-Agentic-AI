@@ -8,7 +8,10 @@ from groq import Groq
 
 def get_groq_client():
     from dotenv import load_dotenv
-    load_dotenv()
+    import pathlib
+    # Always resolve to the repo root .env regardless of CWD
+    env_path = pathlib.Path(__file__).parent.parent / ".env"
+    load_dotenv(dotenv_path=env_path, override=True)
     return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def detect_intent(query, context="", previous_intent=None):

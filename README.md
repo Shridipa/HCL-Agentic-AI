@@ -1,119 +1,280 @@
-🚀 HCLTech Enterprise Assistant — NLP Challenge
+# 🧠 HCLTech Agentic AI — Enterprise Assistant
 
-🧠 Project Overview
-The HCLTech Enterprise Assistant is a modular, enterprise-grade AI system designed to handle a wide range of corporate intents — from retrieving financial insights from the Annual Report (2024–25) to executing internal actions like IT ticket creation and meeting scheduling.
-Built with a Guardrails First philosophy, the assistant ensures high-confidence responses and distinguishes critical policies (e.g., HR rules) from general financial data.
+<div align="center">
 
-🔑 Key Features
+![HCLTech AI](https://img.shields.io/badge/HCLTech-Agentic%20AI-0066cc?style=for-the-badge&logo=brain&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-LLaMA--3%2070B-orange?style=for-the-badge)
+![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-blueviolet?style=for-the-badge)
 
-1. 🎯 Advanced Intent Detection
+**A production-ready, "Guardrails-First" enterprise AI assistant that retrieves financial intelligence, automates IT workflows, and manages corporate actions — powered by RAG + Groq LLaMA-3.**
 
-- Hybrid Classifier using valhalla/distilbart-mnli-12-1 for zero-shot classification.
-- Supported intents:
-- ask_finance: Financial queries (e.g., revenue, growth, strategy).
-- ask_hr: HR policies, headcount, benefits.
-- action_ticket: IT support requests.
-- action_access: Application access requests.
-- action_schedule: Meeting management.
-- Smart Escalation (Rule 0): Urgent or negative queries with low confidence are escalated to human fallback.
+[Live Demo](https://drive.google.com/file/d/1XdwsUorYmzm68y7RskkhRKpUF5pRQhIU/view?usp=sharing) • [API Docs](#api-endpoints) • [Setup Guide](#-quick-start)
 
-2. 🧠 Context-Aware Memory
+</div>
 
-- Topic Switch Detection: Prevents context bleed across unrelated queries.
-- Entity Scoping:
-- Global entities (e.g., Employee ID, Department) persist.
-- Local entities (e.g., Date, Topic) reset on topic change.
+---
 
-3. 📚 Enterprise RAG (Retrieval-Augmented Generation)
+## 📌 Project Overview
 
-- Document Ingestion: FAISS + SentenceTransformers (all-MiniLM-L6-v2) index the Annual Report.
-- Entity-Aware Retrieval: Prioritizes chunks with HR-relevant keywords.
-- Ambiguity Detection: Flags mismatches (e.g., financial data returned for policy queries).
+The HCLTech Agentic AI is a full-stack enterprise assistant built for the NLP Challenge. It combines:
 
-4. ⚙️ Action Management
+- **RAG pipeline** over HCLTech's Annual Report 2024–25 (FAISS + SentenceTransformers)
+- **Groq LLaMA-3 70B** for high-speed, grounded answer synthesis
+- **Multi-intent detection** (finance, HR, IT, scheduling, access)
+- **Agentic actions** — structured JSON output for IT tickets, access requests, meeting scheduling
+- **Premium Next.js dashboard** with glass-morphic UI and real-time chat
 
-- Gradio-Based UI: Interactive dashboard with real-time feedback and confirmation cards.
-- Standardized JSON Output: All actions follow a strict schema for easy integration with Jira, Outlook, IAM, etc.
+---
 
-🧱 Technical Architecture
-Core Modules
-| | |
-| gradio_app.py | |
-| main_assistant.py | |
-| intent_detector.py | |
-| ner_extractor.py | |
-| query_assistant.py | |
-| agent_policy.py | |
-| ui_formatter.py | |
-| sentiment_analyzer.py | |
+## 🏗️ Architecture
 
-Data Assets
+```
+User Query
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│                    FastAPI Backend                       │
+│                                                         │
+│  ┌──────────────┐   ┌──────────────┐   ┌────────────┐  │
+│  │Intent Detect │──▶│ NER Extract  │──▶│Agent Policy│  │
+│  │(Groq LLaMA-3)│   │(Groq LLaMA-3)│   │   Layer    │  │
+│  └──────────────┘   └──────────────┘   └─────┬──────┘  │
+│                                               │         │
+│         ┌──────────────────┬─────────────────┤         │
+│         ▼                  ▼                 ▼         │
+│   ┌──────────┐      ┌──────────┐      ┌──────────┐    │
+│   │RAG (FAISS│      │ Action   │      │Clarify / │    │
+│   │+ mpnet)  │      │Generator │      │Escalate  │    │
+│   └────┬─────┘      └────┬─────┘      └──────────┘    │
+│        ▼                 ▼                             │
+│   ┌──────────────────────────────┐                    │
+│   │  Groq LLaMA-3 Synthesizer    │                    │
+│   └──────────────────────────────┘                    │
+└─────────────────────────────────────────────────────────┘
+    │
+    ▼
+Next.js Frontend Dashboard (Port 3000)
+```
 
-- faq_index.faiss: Vector store for Annual Report chunks.
-- chunks_mapping.json: Metadata for retrieved vectors.
+### Backend Modules
 
-🚀 Getting Started
+| Module | Purpose |
+|---|---|
+| `api_server.py` | FastAPI entry point — `/api/chat`, `/health`, `/docs` |
+| `main_assistant.py` | Orchestrates the full 5-step pipeline |
+| `intent_detector.py` | Groq-powered zero-shot intent classification |
+| `ner_extractor.py` | Groq-powered named entity extraction |
+| `sentiment_analyzer.py` | Urgency & sentiment analysis via Groq |
+| `query_assistant.py` | FAISS vector retrieval with RRF re-ranking |
+| `agent_policy.py` | Decides: answer / action / clarify / escalate |
+| `action_generator.py` | Structured JSON for tickets, access, meetings |
+| `clarifier.py` | Generates targeted clarification prompts |
+| `citation_enforcer.py` | Validates citations from retrieved chunks |
+| `process_pdf.py` | PDF ingestion & chunk creation |
+| `index_chunks.py` | Builds FAISS index from chunks |
+| `docs_html.py` | In-memory HTML project documentation page |
+| `gradio_app.py` | Optional Gradio interface |
 
-1. Environment Setup
-   Ensure Python 3.10+ is installed, then install dependencies:
-   pip install -r requirements.txt
+### Frontend Pages
 
-2. Launch the Assistant
-   python gradio_app.py
+| Route | Description |
+|---|---|
+| `/` | Login page (username + password) |
+| `/dashboard` | Main chat interface + Finance, Support, Calendar, Access panels |
 
-3. 📄 Interactive Python API & Documentation
-   The project features a professional FastAPI backend with multiple documentation layers:
-   - **Main Documentation:** [http://localhost:8000/](http://localhost:8000/) (Project overview, architecture, tech stack)
-   - **Interactive Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs) (API testing playground)
-   - **Clean ReDoc Reference:** [http://localhost:8000/redoc](http://localhost:8000/redoc) (Detailed API spec)
-   - **OpenAPI Schema:** [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
+---
 
-4. Example Usage
+## ✨ Key Features
 
-- Ask a question:
-  "What is the revenue growth for FY25?"
-- Perform an action:
-  "Schedule a meeting with the Finance team for tomorrow."
-- Report an issue:
-  "My laptop is extremely slow (urgent)."
+### 🎯 Multi-Intent Detection
+- **12 intent classes**: `ask_finance`, `ask_hr`, `ask_it_policy`, `ask_compliance`, `ask_security`, `ask_procurement`, `ask_people`, `action_ticket`, `action_access`, `action_schedule`, and more
+- Groq LLaMA-3 as primary classifier with keyword-boost fallback
+- Multi-turn context stickiness for follow-up queries
 
-Demo video link- https://drive.google.com/file/d/1XdwsUorYmzm68y7RskkhRKpUF5pRQhIU/view?usp=sharing
+### 📚 Enterprise RAG
+- HCLTech Annual Report 2024–25 chunked into 500-token segments
+- `all-mpnet-base-v2` (768-dim) embeddings → FAISS `IndexFlatL2`
+- **Hybrid retrieval**: Semantic similarity + lexical overlap (RRF scoring)
+- Section-aware filtering (Financial / HR / Governance / IT)
+- Direct Groq fallback for queries with no RAG match
 
-## 🔮 Future Roadmap & Improvements
+### ⚙️ Agentic Actions
+- **IT Ticket** — structured JSON with priority, department, reference ID
+- **Access Request** — scoped to application and employee
+- **Meeting Scheduling** — extracts topic, date, time, participants
 
-### Improvements by Feature
+### 🛡️ Guardrails-First Policy
+- Confidence thresholding before answer / action decision
+- Entity validation against retrieved chunks
+- Human escalation trigger for high-urgency / low-confidence cases
 
-#### 1. 🎯 Advanced Intent Detection
+### 💎 Premium Dashboard
+- Dark glassmorphic Next.js UI (shadcn/ui components)
+- Real-time chat with structured JSON response cards
+- Finance ledger, Support tickets, Calendar, Access panels
+- Persistent local storage for meetings and tickets
 
-- **Multi-turn intent refinement**: Track evolving user intent across turns (e.g., a finance query that shifts into HR implications).
-- **Confidence calibration**: Use ensemble scoring (combine zero-shot + keyword + historical patterns) to reduce false positives.
-- **Custom intent expansion**: Add domain-specific intents (e.g., compliance, procurement, security).
-- **Explainability layer**: Provide a short rationale for detected intent to build user trust.
+---
 
-#### 2. 🧠 Context-Aware Memory
+## 🚀 Quick Start
 
-- **Hierarchical memory**: Distinguish between session memory (short-term) and persistent memory (long-term).
-- **Conflict resolution**: If global and local entities clash, prompt the user for clarification.
-- **Sentiment-aware memory**: Track tone/emotion to adapt responses (e.g., urgency, frustration).
-- **Privacy guardrails**: Allow users to view, edit, or delete stored entities for transparency.
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- A [Groq API key](https://console.groq.com/keys)
 
-#### 3. 📚 Enterprise RAG
+### 1. Clone & Configure
 
-- **Multi-source retrieval**: Expand beyond Annual Report to include policy docs, FAQs, and IT manuals.
-- **Dynamic weighting**: Adjust retrieval scoring based on detected intent (finance vs HR vs IT).
-- **Semantic clustering**: Group related chunks to provide holistic answers instead of isolated snippets.
-- **Feedback loop**: Let users rate retrieved answers to fine-tune FAISS embeddings.
+```bash
+git clone https://github.com/Shridipa/HCL-Agentic-AI.git
+cd HCL-Agentic-AI
+```
 
-#### 4. ⚙️ Action Management
+Create `.env` in the project root:
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
 
-- **Adaptive UI**: Personalize dashboard views (e.g., HR queries show benefits cards, IT queries show ticket forms).
-- **Action chaining**: Support multi-step workflows (e.g., schedule meeting → auto-generate invite → attach relevant docs).
-- **Error recovery**: If JSON schema fails, auto-correct and retry instead of escalating immediately.
-- **Analytics layer**: Track usage patterns (most common intents, escalation frequency) to optimize system design.
+### 2. Backend Setup
 
-### 🚀 Strategic Enhancements
+```bash
+cd backend
+pip install -r requirements.txt
+python api_server.py
+```
 
-- **LLM Guardrails**: Add toxicity filters and compliance checks before responses.
-- **Human-in-the-loop learning**: Escalated cases feed back into training data for improved automation.
-- **Cross-platform integration**: Extend beyond Jira/Outlook/IAM to Slack, Teams, ServiceNow.
-- **Performance optimization**: Use caching for frequently asked queries (e.g., HR policies).
+Backend runs at → **http://localhost:8000**
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+```
+
+Create `frontend/.env.local`:
+```env
+ML_MODEL_ENDPOINT=http://localhost:8000/api/chat
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+```bash
+npm install
+npm run dev
+```
+
+Frontend runs at → **http://localhost:3000**
+
+---
+
+## 🔌 API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | Interactive project documentation |
+| `GET` | `/health` | Health check |
+| `GET` | `/docs` | Swagger UI |
+| `GET` | `/redoc` | ReDoc API reference |
+| `POST` | `/api/chat` | Main chat endpoint |
+
+### `/api/chat` Payload
+
+```json
+{
+  "query": "What was HCLTech's revenue growth in FY25?",
+  "user": "Alice",
+  "history": []
+}
+```
+
+### Response Schema
+
+```json
+{
+  "reply": "{\"title\": \"Answer: Revenue Growth\", \"direct_answer\": \"...\", \"key_insights\": [...], \"citations\": [...], \"confidence_score\": \"High\"}",
+  "confidence": 0.9
+}
+```
+
+---
+
+## 💬 Example Queries
+
+| Type | Example |
+|---|---|
+| Finance | `"What was HCLTech's revenue in FY25?"` |
+| People | `"Who is the CEO of HCLTech?"` |
+| HR | `"What is the maternity leave policy?"` |
+| IT Ticket | `"My laptop screen is flickering, raise a high priority ticket"` |
+| Access | `"I need access to the SAP portal"` |
+| Scheduling | `"Schedule a meeting with the finance team for next Monday at 10am"` |
+
+---
+
+## 📁 Project Structure
+
+```
+HCL-Agentic-AI/
+├── .env                          # Root env (GROQ_API_KEY)
+├── .gitignore
+├── README.md
+├── docker-compose.yml
+│
+├── backend/
+│   ├── api_server.py             # FastAPI server
+│   ├── main_assistant.py         # Pipeline orchestrator
+│   ├── intent_detector.py        # Intent classification
+│   ├── ner_extractor.py          # Entity extraction
+│   ├── sentiment_analyzer.py     # Sentiment & urgency
+│   ├── query_assistant.py        # FAISS retrieval
+│   ├── agent_policy.py           # Policy decision layer
+│   ├── action_generator.py       # Action JSON builder
+│   ├── clarifier.py              # Clarification generator
+│   ├── citation_enforcer.py      # Citation validator
+│   ├── ui_formatter.py           # Response formatter
+│   ├── process_pdf.py            # PDF → chunks
+│   ├── index_chunks.py           # Chunks → FAISS index
+│   ├── gradio_app.py             # Gradio UI (optional)
+│   ├── docs_html.py              # Documentation HTML
+│   ├── faq_index.faiss           # Pre-built vector index
+│   ├── chunks_mapping.json       # Chunk metadata
+│   ├── chunks.json               # Raw chunks
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+└── frontend/
+    ├── app/
+    │   ├── page.tsx              # Login page
+    │   ├── dashboard/page.tsx    # Main dashboard
+    │   └── api/chat/route.ts     # Next.js API proxy
+    ├── components/ui/            # shadcn/ui components
+    ├── public/
+    │   ├── avatar.png            # AI avatar
+    │   └── docs.html             # Static docs page
+    ├── .env.local                # Frontend env vars
+    └── package.json
+```
+
+---
+
+## 🔮 Roadmap
+
+- [ ] Multi-document RAG (policy docs, IT manuals, FAQs)
+- [ ] Persistent conversation history (PostgreSQL / Redis)
+- [ ] User authentication with JWT
+- [ ] Analytics dashboard (intent frequency, escalation rate)
+- [ ] Slack / MS Teams integration
+- [ ] Fine-tuned intent classifier on HCLTech domain data
+
+---
+
+## 📄 License
+
+This project was built for the **HCLTech NLP Challenge 2026**.
+
+---
+
+<div align="center">
+Built with ❤️ by <strong>Shridipa Dasgupta</strong>
+</div>

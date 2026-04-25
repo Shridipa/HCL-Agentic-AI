@@ -62,12 +62,10 @@ interface Meeting {
 export default function Dashboard() {
   const router = useRouter();
   const [userName, setUserName] = useState('User');
-  const [userEmail, setUserEmail] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [scheduleStatus, setScheduleStatus] = useState<string | null>(null);
 
   // Dialog states
   const [financeDialog, setFinanceDialog] = useState(false);
@@ -113,9 +111,7 @@ export default function Dashboard() {
       try {
         const parsed = JSON.parse(storedUser);
         const name = parsed.username || parsed.name || 'User';
-        const email = parsed.email || '';
         setUserName(name);
-        setUserEmail(email);
         setMessages([{ id: 'welcome', text: `Hello ${name}, I am your HCL Intelligent Assistant. How can I facilitate your operations today?`, isUser: false, timestamp: new Date() }]);
       } catch (error) { console.error('Error parsing user data:', error); }
     }
@@ -126,45 +122,7 @@ export default function Dashboard() {
     router.push('/');
   };
 
-  const scheduleMeetingNotification = async (action: Record<string, unknown>) => {
-    try {
-      // Get latest email from localStorage as backup to state (prevents stale closures/initialization issues)
-      let currentEmail = userEmail;
-      if (!currentEmail) {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            const parsed = JSON.parse(storedUser);
-            currentEmail = parsed.email || '';
-          } catch {}
-        }
-      }
 
-      const backendUrl = process.env.NEXT_PUBLIC_ML_BACKEND || 'http://localhost:8000';
-      const payload = {
-        topic: action.topic || 'Meeting',
-        date: action.date || 'TBD',
-        time: action.time || 'TBD',
-        location: action.location || 'Virtual',
-        participants: action.participants || [],
-        participant_emails: action.participant_emails || [],
-        organizer_email: currentEmail,
-        organizer_name: userName, // Pass the dynamic user name
-      };
-      const res = await fetch(`${backendUrl}/api/schedule`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (data.status === 'success' || data.status === 'partial') setScheduleStatus(`✅ ${data.summary}`);
-      else setScheduleStatus(`⚠️ Meeting saved locally. ${data.summary}`);
-    } catch (err) {
-      console.error('Schedule notification error:', err);
-      setScheduleStatus('⚠️ Meeting saved locally (Backend Offline).');
-    }
-    setTimeout(() => setScheduleStatus(null), 8000);
-  };
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
@@ -189,7 +147,6 @@ export default function Dashboard() {
           const action = parsed.action_data;
           const newMeeting: Meeting = { id: `meet-${Date.now()}`, title: action.topic || 'New Meeting', date: action.date || 'TBD', time: action.time || 'TBD', participants: Array.isArray(action.participants) ? action.participants : [action.participants], status: 'scheduled' };
           setMeetings(prev => [newMeeting, ...prev]);
-          scheduleMeetingNotification(action);
         }
       } catch { }
       setMessages(prev => [...prev, { id: `bot-${Date.now()}`, text: replyText, isUser: false, timestamp: new Date(), metadata: data.metadata }]);
@@ -288,7 +245,6 @@ export default function Dashboard() {
             <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold">{userName.substring(0, 2).toUpperCase()}</div>
             <div className="overflow-hidden">
               <p className="text-xs font-bold truncate">{userName}</p>
-              <p className="text-[10px] text-slate-500 truncate">{userEmail}</p>
             </div>
           </div>
           <Button variant="ghost" onClick={handleLogout} className="w-full justify-start text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 rounded-lg">退出 Logout</Button>
@@ -312,11 +268,6 @@ export default function Dashboard() {
         </header>
 
         <div className="flex-1 overflow-auto p-8 space-y-6 scroll-smooth">
-          {scheduleStatus && (
-            <div className="animate-slide-up bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 flex items-center gap-3 text-sm text-blue-300 glass mx-auto max-w-xl">
-              <span>📅</span><p>{scheduleStatus}</p>
-            </div>
-          )}
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'} animate-slide-up`}>
               <div className={`p-4 rounded-3xl max-w-[80%] lg:max-w-2xl ${msg.isUser ? 'bg-blue-600 shadow-lg shadow-blue-500/20' : 'glass-card glow-purple'}`}>

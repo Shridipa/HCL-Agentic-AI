@@ -5,10 +5,14 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Any
 import uvicorn
 import os
+import traceback
 from dotenv import load_dotenv
 
 # Load environment variables from .env
-load_dotenv()
+import pathlib
+# Explicitly load root .env (works regardless of CWD)
+_env_path = pathlib.Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=_env_path, override=True)
 
 # Lazy-load AI pipeline
 _run_pipeline = None
@@ -48,23 +52,7 @@ class ChatResponse(BaseModel):
     metadata: Optional[dict] = {}
     confidence: Optional[float] = 1.0
 
-class ScheduleRequest(BaseModel):
-    """Payload sent from the Next.js frontend to trigger calendar+email on meeting confirm."""
-    topic: str
-    date: Optional[str] = "TBD"
-    time: Optional[str] = "TBD"
-    location: Optional[str] = "Virtual"
-    participants: Optional[Any] = []
-    participant_emails: Optional[List[str]] = []
-    organizer_email: Optional[str] = ""
-    organizer_name: Optional[str] = "Associate"
 
-class ScheduleResponse(BaseModel):
-    status: str          # "success" | "partial" | "failed"
-    summary: str
-    meet_link: Optional[str] = ""
-    calendar: Optional[dict] = {}
-    email: Optional[dict] = {}
 
 # THE ONLY DOCUMENTATION ROUTE
 @app.get("/", response_class=HTMLResponse)
@@ -85,41 +73,10 @@ async def chat(request: ChatRequest):
         response_text = pipeline(request.query, history=request.history)
         return ChatResponse(reply=response_text, confidence=0.9)  # type: ignore
     except Exception as e:
-        print(f"API Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        tb = traceback.format_exc()
+        print(f"API Error [{type(e).__name__}]: {repr(e)}\n{tb}")
+        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {repr(e)}")
 
-@app.post("/api/schedule", response_model=ScheduleResponse)
-async def schedule_meeting(request: ScheduleRequest):
-    """
-    Called by the Next.js frontend when the user confirms a schedule_meeting action.
-    Creates a Google Calendar event and sends email notifications to all participants.
-    """
-    print(f"DEBUG: Schedule Request received. Organizer: {request.organizer_email}, Topic: {request.topic}")
-    try:
-        from calendar_email_service import schedule_and_notify
-        action_data = {
-            "topic": request.topic,
-            "date": request.date,
-            "time": request.time,
-            "location": request.location,
-            "participants": request.participants,
-            "participant_emails": request.participant_emails,
-        }
-        result = schedule_and_notify(
-            action_data, 
-            organizer_email=request.organizer_email,
-            organizer_name=request.organizer_name
-        )
-        return ScheduleResponse(
-            status=result["status"],
-            summary=result["summary"],
-            meet_link=result.get("meet_link", ""),
-            calendar=result.get("calendar", {}),
-            email=result.get("email", {}),
-        )
-    except Exception as e:
-        print(f"Schedule API Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -9,7 +9,8 @@ import os
 
 def get_groq_client():
     from dotenv import load_dotenv
-    load_dotenv()
+    import pathlib
+    load_dotenv(dotenv_path=pathlib.Path(__file__).parent.parent / ".env", override=True)
     return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def extract_entities(query):

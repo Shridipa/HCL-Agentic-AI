@@ -15,7 +15,7 @@ def get_embedding_model():
     global _embedding_model
     if _embedding_model is None:
         from sentence_transformers import SentenceTransformer
-        _embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        _embedding_model = SentenceTransformer('all-mpnet-base-v2')
     return _embedding_model
 
 def get_rerank_model():
@@ -229,6 +229,7 @@ def retrieve_chunks(query, index_path, mapping_path, k=5, boost_keywords=None, s
             
 
             chunk["rrf_score"] = float(rrf_base) + float(lex_score)
+            chunk["score"] = chunk["rrf_score"]  # alias expected by main_assistant.py
 
             candidate_map[idx] = chunk
 
